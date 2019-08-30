@@ -1,0 +1,20 @@
+name: flutter_video
+description: Base by bilibili ijkplayer, it's video/audio player, support https、rtmp、m3u8 and more protocol.
+version: 0.1.0
+author: zhangbaolin<572352296@qq.com>
+homepage:
+
+environment:
+  sdk: '>=2.1.0 <3.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+flutter:
+  plugin:
+    androidPackage: top.kikt.ijkplayer
+    pluginClass: IjkplayerPlugin
