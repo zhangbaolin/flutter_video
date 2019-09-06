@@ -1,3 +1,6 @@
+## 0.1.2
+
+fix some bug
 ## 0.0.8
 
 fix some bug
