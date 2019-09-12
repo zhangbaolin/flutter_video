@@ -46,12 +46,13 @@ class _ProgressBarState extends State<ProgressBar> {
     return l;
   }
 
+  var mid;
   @override
   Widget build(BuildContext context) {
     if (widget.max == null || widget.current == null || widget.max == 0)
       return _buildEmpty();
 
-    var mid = (widget.buffered ?? 0) / widget.max - left;
+    mid = (widget.buffered ?? 0) / widget.max;
     if (mid < 0) {
       mid = 0;
     }
@@ -131,7 +132,11 @@ class _ProgressBarState extends State<ProgressBar> {
 
   void _onTapUp(TapUpDetails details) {
     var progress = getProgress(details.globalPosition);
+
     widget.changeProgressHandler(progress);
+    print("正在播放的位置：$left");
+    print("正在缓存的位置：$mid");
+    print("点击后要播放的位置:  $progress");
   }
 
   void _onHorizontalDragUpdate(DragUpdateDetails details) {

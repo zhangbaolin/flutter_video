@@ -194,11 +194,13 @@ class Ijk(private val registry: PluginRegistry.Registrar, private val options: M
         val width = mediaPlayer.videoWidth
         val height = mediaPlayer.videoHeight
         val outputFps = mediaPlayer.videoOutputFramesPerSecond
+        val bufferPosition = mediaPlayer.videoCachedDuration
 //        mediaPlayer.mediaInfo.mAudioDecoder
 //        mediaPlayer.mediaInfo.mVideoDecoder
         return Info(
                 duration = duration.toDouble() / 1000,
                 currentPosition = currentPosition.toDouble() / 1000,
+                 bufferPosition = bufferPosition.toDouble()/1000,
                 width = width,
                 height = height,
                 isPlaying = textureMediaPlayer.isPlaying,

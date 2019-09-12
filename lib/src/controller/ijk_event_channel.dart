@@ -39,7 +39,8 @@ class _IJKEventChannel {
         onPlayStateChange(getInfo(call));
         break;
       case "prepare":
-        onPrepare(getInfo(call));
+       // onPrepare(getInfo(call));
+         onPlayStateChange(getInfo(call));
         break;
       case "rotateChanged":
         onRotateChanged(call);

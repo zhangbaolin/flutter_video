@@ -45,7 +45,8 @@ class IjkStatusWidget extends StatelessWidget {
       return _buildProgressWidget(context);
     }
     if (status == IjkStatus.prepared) {
-      return _buildPreparedWidget(context, controller);
+      //return _buildPreparedWidget(context, controller);
+       return _buildProgressWidget(context);
     }
     if (status == IjkStatus.error) {
       return _buildFailWidget(context);
@@ -61,13 +62,40 @@ class IjkStatusWidget extends StatelessWidget {
     }
     return Container();
   }
-
-  static Widget _buildPreparedWidget(
-    BuildContext context,
-    IjkMediaController controller,
-  ) {
-    return _buildCenterIconButton(Icons.play_arrow, controller.play);
+ static Widget _buildProgressWidget(BuildContext context) {
+    //print("hahahahaaaaaaaaaaaaahhhhhhh$tcpSpeed");
+    //int speed = controller.videoInfo.tcpSpeed ~/ 128;
+     
+    return Center(
+      child: Container(
+        alignment: Alignment.center,
+        color: Color.fromRGBO(0, 0, 0, 0.54),
+        width: 80,
+        height: 80,
+        child: Column(
+          children: <Widget>[
+            CircularProgressIndicator(
+              backgroundColor: Colors.greenAccent,
+            ),
+            Container(
+              height: 30,
+              alignment: Alignment.center,
+              child: Text(
+                "正在加载中...",
+                style: TextStyle(color: Colors.white, fontSize: 13),
+              ),
+            )
+          ],
+        ),
+      ),
+    );
   }
+  // static Widget _buildPreparedWidget(
+  //   BuildContext context,
+  //   IjkMediaController controller,
+  // ) {
+  //   return _buildCenterIconButton(Icons.play_arrow, controller.play);
+  // }
 }
 
 Widget _buildNothing(BuildContext context) {
@@ -98,18 +126,7 @@ Widget _buildCenterIconButton(IconData iconData, Function onTap) {
   );
 }
 
-Widget _buildProgressWidget(BuildContext context) {
-  return Center(
-    child: Container(
-      width: 60,
-      height: 60,
-      child: RefreshProgressIndicator(
-        backgroundColor: Colors.transparent,
-        valueColor: AlwaysStoppedAnimation(Colors.white),
-      ),
-    ),
-  );
-}
+
 
 Widget _buildFailWidget(BuildContext context) {
   return Center(

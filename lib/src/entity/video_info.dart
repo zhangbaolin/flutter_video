@@ -13,7 +13,8 @@ class VideoInfo {
 
   /// Current playback progress
   double currentPosition;
-
+  ///buffer  playback progress
+  double bufferPosition;
   /// In play
   bool isPlaying;
 
@@ -60,6 +61,7 @@ class VideoInfo {
     this.isPlaying = map["isPlaying"];
     this.degree = map["degree"];
     this.tcpSpeed = map["tcpSpeed"];
+     this.bufferPosition = map["bufferPosition"];
   }
 
   @override

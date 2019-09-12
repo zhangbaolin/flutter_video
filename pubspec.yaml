@@ -10,6 +10,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  orientation: ^1.1.0
+  screen: ^0.0.5
 
 dev_dependencies:
   flutter_test:

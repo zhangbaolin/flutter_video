@@ -4,6 +4,7 @@ package top.kikt.ijkplayer.entity
 data class Info(
         val duration: Double,
         val currentPosition: Double,
+        val bufferPosition: Double,
         val width: Int,
         val height: Int,
         val isPlaying: Boolean,
@@ -17,6 +18,7 @@ data class Info(
         val map = HashMap<String, Any>()
         map["duration"] = duration
         map["currentPosition"] = currentPosition
+        map["bufferPosition"] = bufferPosition
         map["width"] = width
         map["height"] = height
         map["isPlaying"] = isPlaying

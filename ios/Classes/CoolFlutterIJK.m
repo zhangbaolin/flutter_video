@@ -328,7 +328,7 @@
     CGSize size = [controller naturalSize];
     NSTimeInterval duration = [controller duration];
     NSTimeInterval currentPlaybackTime = [controller currentPlaybackTime];
-
+    NSTimeInterval bufferPosition = [controller playableDuration];
     info.size = size;
     info.duration = duration;
     info.currentPosition = currentPlaybackTime;
@@ -336,6 +336,7 @@
     info.degree = degree;
     info.tcpSpeed = [controller tcpSpeed];
     info.outputFps = [controller fpsAtOutput];
+     info.bufferPosition=bufferPosition;
 
     return info;
 }

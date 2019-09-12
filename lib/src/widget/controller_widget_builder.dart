@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter_video/src/widget/fullcontroller_widget_build.dart';
 import 'package:flutter/cupertino.dart';
@@ -11,6 +12,8 @@ import 'package:flutter_video/src/helper/time_helper.dart';
 import 'package:flutter_video/src/helper/ui_helper.dart';
 import 'package:flutter_video/src/route/fullscreen_route.dart';
 import 'package:flutter_video/src/widget/progress_bar.dart';
+import 'package:orientation/orientation.dart';
+import 'package:screen/screen.dart';
 
 part 'full_screen.part.dart';
 
@@ -128,13 +131,23 @@ class _DefaultIJKControllerWidgetState extends State<DefaultIJKControllerWidget>
   Timer progressTimer;
 
   StreamSubscription controllerSubscription;
-
+//新添加计时器
+  Timer bottomBarTimer;
   @override
   void initState() {
     super.initState();
     startTimer();
     controllerSubscription =
         controller.textureIdStream.listen(_onTextureIdChange);
+    bottomBarTimer = Timer.periodic(Duration(seconds: 7), (timer) {
+      if (isShow) {
+        setState(() {
+          isShow = !isShow;
+        });
+      }
+    });
+    //保持屏幕常亮
+    Screen.keepOn(true);
   }
 
   void _onTextureIdChange(int textureId) {
@@ -153,7 +166,12 @@ class _DefaultIJKControllerWidgetState extends State<DefaultIJKControllerWidget>
 
   @override
   void dispose() {
-   
+    if (bottomBarTimer != null) {
+      bottomBarTimer.cancel();
+      bottomBarTimer = null;
+    }
+    //取消屏幕活性
+    Screen.keepOn(false);
     controllerSubscription.cancel();
     stopTimer();
     IjkManager.resetBrightness();
@@ -233,11 +251,19 @@ class _DefaultIJKControllerWidgetState extends State<DefaultIJKControllerWidget>
           // 强制竖屏
           SystemChrome.setPreferredOrientations(
               [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+          if (Platform.isIOS) {
+            OrientationPlugin.forceOrientation(DeviceOrientation.portraitUp);
+          }
+          SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
         } else {
           SystemChrome.setPreferredOrientations([
             DeviceOrientation.landscapeRight,
             DeviceOrientation.landscapeLeft,
           ]);
+          if (Platform.isIOS) {
+            OrientationPlugin.forceOrientation(DeviceOrientation.landscapeLeft);
+          }
+          SystemChrome.setEnabledSystemUIOverlays([]);
           showFullScreenIJKPlayer(
             context,
             controller,
@@ -320,7 +346,16 @@ class _DefaultIJKControllerWidgetState extends State<DefaultIJKControllerWidget>
 
   _ProgressCalculator _calculator;
 
-  onTap() => isShow = !isShow;
+  onTap() {
+    isShow = !isShow;
+    // bottomBarTimer = Timer.periodic(Duration(seconds: 8), (timer) {
+    //   if (isShow) {
+    //     setState(() {
+    //       isShow = false;
+    //     });
+    //   }
+    // });
+  }
 
   Function onDoubleTap() {
     return widget.doubleTapPlay
@@ -385,7 +420,6 @@ class _DefaultIJKControllerWidgetState extends State<DefaultIJKControllerWidget>
   bool verticalDragging = false;
   bool leftVerticalDrag;
 
-  
   Future<int> getVolume() async {
     switch (widget.volumeType) {
       case VolumeType.media:
@@ -531,16 +565,24 @@ class PortraitController extends StatelessWidget {
       return Container();
     }
     return Container(
-      height: 22,
+      height: 20,
       child: ProgressBar(
         current: info.currentPosition,
         max: info.duration,
+        buffered: info.bufferPosition,
+        bufferColor: Colors.green[200],
         changeProgressHandler: (progress) async {
           await controller.seekToProgress(progress);
           tooltipDelegate?.hideTooltip();
         },
         tapProgressHandler: (progress) {
-          showProgressTooltip(info, progress);
+          // showProgressTooltip(info, progress);
+          if (controller.ijkStatus == IjkStatus.prepared ||
+              controller.ijkStatus == IjkStatus.prepared) {
+            controller.refreshVideoInfo();
+            print("点击了progress，修改了视频播放的状态${controller.ijkStatus}");
+          }
+          print("点击了progress，修改了视频播放的状态${controller.ijkStatus}");
         },
       ),
     );

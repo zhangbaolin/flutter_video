@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_video/flutter_video.dart';
 
 class TestPage extends StatefulWidget {
@@ -7,30 +10,74 @@ class TestPage extends StatefulWidget {
 }
 
 class _TestPageState extends State<TestPage> with WidgetsBindingObserver {
-  IjkMediaController controller;
   bool isSeeHWidget = true;
+  IjkMediaController controller = IjkMediaController();
+  Timer _timer;
   @override
   void initState() {
     super.initState();
+    //  SystemChrome.setEnabledSystemUIOverlays([]);
     WidgetsBinding.instance.addObserver(this); //添加观察者
-    controller = IjkMediaController();
-    controller.setAssetDataSource('assets/video0.mp4', autoPlay: true);
+    controller.setNetworkDataSource(
+        "http://multimedia.lx8886.com/upload/20190908051310.mp4",
+        autoPlay: true);
+
+    // _timer = Timer.periodic(Duration(milliseconds: 100), (timer) {
+    //   print("当前的播放状态：${controller.ijkStatus}");
+    //   if (controller.ijkStatus == IjkStatus.playing) {
+    //     setPro();
+    //     _timer.cancel();
+    //     _timer = null;
+    //   }
+    // });
   }
 
+  void setPro() async {
+    await controller.seekToProgress(0.5);
+  }
+
+  //http://multimedia.lx8886.com/upload/20190908051310.mp4
+//http://app.12321hc.com/app/video0.mp4
+//rtmp://192.168.1.56/live/stream1
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('测试'),
-      ),
+      // appBar: AppBar(
+
+      //   title: Text('测试'),
+      // ),
       body: Container(
-        child: Center(
-            child: AspectRatio(
-          aspectRatio: 3 / 2,
-          child: IjkPlayer(
-            mediaController: controller,
-          ),
-        )),
+        child: Stack(
+          children: <Widget>[
+            ListView(
+              children: <Widget>[
+                AspectRatio(
+                  aspectRatio: 3 / 2,
+                  child: IjkPlayer(
+                    mediaController: controller,
+                    // textureBuilder: (context, mediaController, info) {
+
+                    //   return Container(
+                    //     height: 300,
+                    //     width: MediaQuery.of(context).size.width,
+                    //     child: IjkPlayer(
+                    //       mediaController: mediaController,
+                    //     ),
+                    //   );
+                    // },
+                    // statusWidgetBuilder: (context, mediaController, stte) {
+                    //   return Container(
+                    //     margin: EdgeInsets.only(top: 50),
+                    //     child:
+                    //         Text("data", style: TextStyle(color: Colors.white)),
+                    //   );
+                    // },
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -56,8 +103,13 @@ class _TestPageState extends State<TestPage> with WidgetsBindingObserver {
 
   @override
   void dispose() {
+    SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
     controller.dispose();
     WidgetsBinding.instance.removeObserver(this); //销毁观察者
+    if (_timer != null) {
+      _timer.cancel();
+      _timer = null;
+    }
     super.dispose();
   }
 }

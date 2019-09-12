@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter_video/src/widget/controller_widget_builder.dart';
 import 'package:flutter/cupertino.dart';
@@ -10,6 +11,8 @@ import 'package:flutter_video/src/helper/logutil.dart';
 import 'package:flutter_video/src/helper/time_helper.dart';
 import 'package:flutter_video/src/helper/ui_helper.dart';
 import 'package:flutter_video/src/widget/progress_bar.dart';
+import 'package:orientation/orientation.dart';
+import 'package:screen/screen.dart';
 
 /// Using mediaController to Construct a Controller UI
 typedef Widget IJKControllerWidgetBuilder(IjkMediaController controller);
@@ -95,13 +98,24 @@ class _DefaultIJKControllerWidgetState extends State<FullIJKControllerWidget>
   Timer progressTimer;
 
   StreamSubscription controllerSubscription;
-
+//新添加计时器
+  Timer bottomBarTimer;
   @override
   void initState() {
     super.initState();
     startTimer();
     controllerSubscription =
         controller.textureIdStream.listen(_onTextureIdChange);
+    bottomBarTimer = Timer.periodic(Duration(seconds: 7), (timer) {
+      if (isShow) {
+        setState(() {
+          isShow = !isShow;
+        });
+      }
+    });
+
+    //全屏状态下保持屏幕火星
+    Screen.keepOn(true);
   }
 
   void _onTextureIdChange(int textureId) {
@@ -120,14 +134,22 @@ class _DefaultIJKControllerWidgetState extends State<FullIJKControllerWidget>
 
   @override
   void dispose() {
-
+    if (bottomBarTimer != null) {
+      bottomBarTimer.cancel();
+      bottomBarTimer = null;
+    }
+   // Screen.keepOn(false);
     controllerSubscription.cancel();
     stopTimer();
     IjkManager.resetBrightness();
     // 强制竖屏
-    print('播放器控制器被销毁了111111111111111111');
+    print('播放器控制器被销毁了');
     SystemChrome.setPreferredOrientations(
         [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+    if (Platform.isIOS) {
+      OrientationPlugin.forceOrientation(DeviceOrientation.portraitUp);
+    }
+    SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
     super.dispose();
   }
 
@@ -201,11 +223,20 @@ class _DefaultIJKControllerWidgetState extends State<FullIJKControllerWidget>
           // 强制竖屏
           SystemChrome.setPreferredOrientations(
               [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+          SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
+          if (Platform.isIOS) {
+            OrientationPlugin.forceOrientation(DeviceOrientation.portraitUp);
+          }
         } else {
           SystemChrome.setPreferredOrientations([
             DeviceOrientation.landscapeRight,
             DeviceOrientation.landscapeLeft,
           ]);
+          if (Platform.isIOS) {
+            OrientationPlugin.forceOrientation(DeviceOrientation.landscapeLeft);
+          }
+
+          SystemChrome.setEnabledSystemUIOverlays([]);
           showFullScreenIJKPlayer(
             context,
             controller,
@@ -601,12 +632,14 @@ class PortraitController extends StatelessWidget {
       child: ProgressBar(
         current: info.currentPosition,
         max: info.duration,
+        buffered: info.bufferPosition,
+        bufferColor: Colors.green[200],
         changeProgressHandler: (progress) async {
           await controller.seekToProgress(progress);
           tooltipDelegate?.hideTooltip();
         },
         tapProgressHandler: (progress) {
-          showProgressTooltip(info, progress);
+          // showProgressTooltip(info, progress);
         },
       ),
     );
