@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_video/flutter_video.dart';
+import 'package:ijkplayer_example/widget/controller_widget_builder.dart';
 
 class TestPage extends StatefulWidget {
   @override
@@ -11,12 +12,14 @@ class TestPage extends StatefulWidget {
 
 class _TestPageState extends State<TestPage> with WidgetsBindingObserver {
   bool isSeeHWidget = true;
-  IjkMediaController controller = IjkMediaController();
+  IjkMediaController controller = IjkMediaController(isNomal: true);
+
   Timer _timer;
   @override
   void initState() {
     super.initState();
     //  SystemChrome.setEnabledSystemUIOverlays([]);
+
     WidgetsBinding.instance.addObserver(this); //添加观察者
     controller.setNetworkDataSource(
         "http://multimedia.lx8886.com/upload/20190908051310.mp4",
@@ -72,6 +75,9 @@ class _TestPageState extends State<TestPage> with WidgetsBindingObserver {
                     //         Text("data", style: TextStyle(color: Colors.white)),
                     //   );
                     // },
+                    controllerWidgetBuilder: (mediaController) {
+                      return defaultBuildIjkControllerWidget(mediaController,adrevealTime: 1,addisappearTime: 10);
+                    },
                   ),
                 ),
               ],

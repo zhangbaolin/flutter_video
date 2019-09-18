@@ -39,11 +39,15 @@ class _IJKEventChannel {
         onPlayStateChange(getInfo(call));
         break;
       case "prepare":
-       // onPrepare(getInfo(call));
-         onPlayStateChange(getInfo(call));
+        // onPrepare(getInfo(call));
+        onPlayStateChange(getInfo(call));
         break;
       case "rotateChanged":
         onRotateChanged(call);
+        break;
+      case "setOnBufferingUpdate":
+        // onRotateChanged(call);
+        //  print("eneneneneneneneneenne");
         break;
       case "error":
         var info = await controller.getVideoInfo();

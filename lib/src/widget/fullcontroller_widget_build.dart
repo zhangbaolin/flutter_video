@@ -83,7 +83,7 @@ class _DefaultIJKControllerWidgetState extends State<FullIJKControllerWidget>
 
   GlobalKey currentKey = GlobalKey();
 
-  bool _isShow = true;
+  bool _isShow = false;
 
   set isShow(bool value) {
     _isShow = value;
@@ -100,22 +100,32 @@ class _DefaultIJKControllerWidgetState extends State<FullIJKControllerWidget>
   StreamSubscription controllerSubscription;
 //新添加计时器
   Timer bottomBarTimer;
+  Timer firstbottomTimer;
+
+  bool isVoiceNone = false;
   @override
   void initState() {
     super.initState();
     startTimer();
     controllerSubscription =
         controller.textureIdStream.listen(_onTextureIdChange);
-    bottomBarTimer = Timer.periodic(Duration(seconds: 7), (timer) {
-      if (isShow) {
-        setState(() {
-          isShow = !isShow;
-        });
-      }
-    });
-
+    isShowbottomBar();
     //全屏状态下保持屏幕火星
     Screen.keepOn(true);
+  }
+
+  void isShowbottomBar() {
+    firstbottomTimer = Timer.periodic(Duration(seconds: 5), (timer) {
+      if (!isShow) {
+        setState(() {
+          isShow = true;
+        });
+      }
+      if (firstbottomTimer != null) {
+        firstbottomTimer.cancel();
+        firstbottomTimer = null;
+      }
+    });
   }
 
   void _onTextureIdChange(int textureId) {
@@ -138,7 +148,11 @@ class _DefaultIJKControllerWidgetState extends State<FullIJKControllerWidget>
       bottomBarTimer.cancel();
       bottomBarTimer = null;
     }
-   // Screen.keepOn(false);
+    if (firstbottomTimer != null) {
+      firstbottomTimer.cancel();
+      firstbottomTimer = null;
+    }
+    // Screen.keepOn(false);
     controllerSubscription.cancel();
     stopTimer();
     IjkManager.resetBrightness();
@@ -188,9 +202,19 @@ class _DefaultIJKControllerWidgetState extends State<FullIJKControllerWidget>
   }
 
   Widget buildContent() {
-    if (!isShow) {
-      return Container();
-    }
+    // if (!isShow) {
+    //   return Container();
+    // }
+    // return StreamBuilder<VideoInfo>(
+    //   stream: controller.videoInfoStream,
+    //   builder: (context, snapshot) {
+    //     var info = snapshot.data;
+    //     if (info == null || !info.hasData) {
+    //       return Container();
+    //     }
+    //     return buildPortrait(info);
+    //   },
+    // );
     return StreamBuilder<VideoInfo>(
       stream: controller.videoInfoStream,
       builder: (context, snapshot) {
@@ -198,7 +222,15 @@ class _DefaultIJKControllerWidgetState extends State<FullIJKControllerWidget>
         if (info == null || !info.hasData) {
           return Container();
         }
-        return buildPortrait(info);
+        return Stack(
+          children: <Widget>[
+            Center(),
+            Offstage(
+              offstage: isShow,
+              child: buildPortrait(info),
+            )
+          ],
+        );
       },
     );
   }
@@ -252,14 +284,53 @@ class _DefaultIJKControllerWidgetState extends State<FullIJKControllerWidget>
 
   int _overlayTurns = 0;
 
+  // Widget buildPortrait(VideoInfo info) {
+  //   _overlayTurns = FullScreenHelper.getQuarterTurns(info, context);
+  //   return PortraitController(
+  //     controller: controller,
+  //     info: info,
+  //     tooltipDelegate: this,
+  //     playWillPauseOther: widget.playWillPauseOther,
+  //     fullScreenWidget: _buildFullScreenButton(),
+  //   );
+  // }
   Widget buildPortrait(VideoInfo info) {
     _overlayTurns = FullScreenHelper.getQuarterTurns(info, context);
-    return PortraitController(
-      controller: controller,
-      info: info,
-      tooltipDelegate: this,
-      playWillPauseOther: widget.playWillPauseOther,
-      fullScreenWidget: _buildFullScreenButton(),
+    return Stack(
+      children: <Widget>[
+        PortraitController(
+          controller: controller,
+          info: info,
+          tooltipDelegate: this,
+          playWillPauseOther: widget.playWillPauseOther,
+          fullScreenWidget: _buildFullScreenButton(),
+        ),
+        Container(
+          padding: EdgeInsets.only(left: 15),
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: GestureDetector(
+              onTap: () {
+                // 设置静音
+                if (isVoiceNone) {
+                  setState(() {
+                    controller.volume = 30;
+                    isVoiceNone = false;
+                  });
+                } else {
+                  setState(() {
+                    controller.volume = 0;
+                    isVoiceNone = true;
+                  });
+                }
+              },
+              child: isVoiceNone
+                  ? Icon(Icons.settings_voice, color: Colors.red, size: 25)
+                  : Icon(Icons.settings_voice, color: Colors.white, size: 25),
+            ),
+          ),
+        )
+      ],
     );
   }
 
@@ -321,7 +392,29 @@ class _DefaultIJKControllerWidgetState extends State<FullIJKControllerWidget>
 
   _ProgressCalculator _calculator;
 
-  onTap() => isShow = !isShow;
+  onTap() {
+    isShow = !isShow;
+    if (firstbottomTimer != null) {
+      firstbottomTimer.cancel();
+      firstbottomTimer = null;
+    }
+    if (bottomBarTimer != null) {
+      bottomBarTimer.cancel();
+      bottomBarTimer = null;
+    }
+    bottomBarTimer = Timer.periodic(Duration(seconds: 5), (timer) {
+      if (!isShow) {
+        setState(() {
+          isShow = true;
+        });
+      }
+
+      if (bottomBarTimer != null) {
+        bottomBarTimer.cancel();
+        bottomBarTimer = null;
+      }
+    });
+  }
 
   Function onDoubleTap() {
     return widget.doubleTapPlay

@@ -60,39 +60,9 @@ pubspec.yaml
 
 ```yaml
 dependencies:
-  flutter_ijkplayer: ${lastes_version}
+  flutter_video: ${lastes_version}
 ```
 
-## 原生部分说明
-
-### 自定义编译和原生部分源码
-
-自定义编译的主要目的是修改支持的格式, 因为默认包含了一些编解码器,解复用,协议等等, 这些格式可能你的项目用不到, 这时候可以修改 ffmpeg 的自定义编译选项, 以便于可以缩小库文件的体积, 以达到给 app 瘦身的目的
-
-[当前的编译规则文件](https://gitee.com/kikt/ijkplayer_thrid_party/blob/master/config/module.sh),修改编译选项,这个参考 [bilibili/ijkplayer](https://github.com/bilibili/ijkplayer) 或 [ffmpeg](http://ffmpeg.org/),ffmpeg 的相关信息也可以通过搜索引擎获取
-
-自定义编译选项的完整过程请看[文档](https://github.com/CaiJingLong/flutter_ijkplayer/blob/master/compile-cn.md), 否则不保证编译出来的代码不报错, 具体的更改方案也请查看编译文档, 本篇不再提及
-
-### iOS
-
-因为 iOS 部分代码的库文件比较大,为了方便管理版本, 所以创建了一个 pod 依赖托管 iOS 的 ijkplayer 库
-pod 库托管在 github 仓库内 ,因为网速原因,源码托管在 [azure](https://dev.azure.com/cjlspy/_git/flutter_ijkplayer_pod)
-
-因为 framework 文件的大小超过了 100M,所以采用了压缩的方式储存
-没有采用通用的 tar.gz 或 zip,而是使用 tar.xz 的方式压缩,这个压缩格式压缩率高,但是压缩和解压缩的的速度慢,综合考虑使用高压缩率的方式来快速获取源文件并解压缩  
-如果有朋友愿意提供 cdn 加速,可以联系我 😁
-
-iOS 的原始代码来自于 https://github.com/jadennn/flutter_ijk 中提供的 iOS 代码, 但在这基础上有了修改, 不能直接使用这个仓库的源码, 修改后的项目源码托管在[gitee](https://gitee.com/kikt/ijkplayer_thrid_party)
-
-#### 运行慢的问题
-
-最新的 0.3.3 版本的 pod 库(版本号 0.1.0)库文件托管在 [azure](https://dev.azure.com/cjlspy/_git/flutter_ijkplayer_pod), 在美西下载速度可以达到 4~5M/s 只需要 20 秒左右就可以下载完, 10 多秒解压缩, 国内则会慢很多, 下载速度 1.5M/s 左右, 所以请耐心等待
-
-0.3.2 以前的 pod 源码托管在 github, 国外下载速度能达到 5~6M/s, 国内速度则不足 100k, 所以可能需要 20 分钟, 建议没有用过这个库的人使用最新版本(0.3.3+)或使用代理
-
-### Android
-
-现在的 ffmpeg 编译基本是参考的 [GSYVideoPlayer](https://github.com/CarGuo/GSYVideoPlayer)中的 ex-so 的规则, 但当前项目的 c 语言源码有修改(截取视频帧), 所以你**不能**直接拿别的项目的 so 文件来用, 修改的内容可以在[gitee](https://gitee.com/kikt/ijkplayer_thrid_party)查到
 
 ## 入门示例
 
@@ -168,18 +138,9 @@ class HomePageState extends State<HomePage> {
 
 ### 设置
 
-每个 ijkplayer 对应一个 IjkMediaController;
 
 ```dart
-IjkMediaController controller = IjkMediaController();
-```
 
-将 controller 设置给 ijkplayer
-
-```dart
-  var ijkplayer = IjkPlayer(
-    mediaController: controller,
-  );
 ```
 
 ### 关于销毁
@@ -465,52 +426,23 @@ IJKPlayer(
 );
 ```
 
-### 根据当前状态构建一个 widget
 
-根据 Controller 当时 IjkStatus 的值构建 Widget,这个 Widget 会根据当前 status 变化而呈现出不同的界面
-
-```dart
-
-Widget buildIjkPlayer() {
-  return IjkPlayer(
-    mediaController: mediaController,
-    stateWidgetBuilder: _buildStatusWidget,
-  );
-}
-
-Widget _buildStatusWidget(
-  BuildContext context,
-  IjkMediaController controller,
-  IjkStatus status,
-) {
-  if (status == IjkStatus.noDatasource) {
-    return Center(
-      child: Text(
-        "no data",
-        style: TextStyle(color: Colors.white),
-      ),
-    );
-  }
-
-  // you can custom your self status widget
-  return IjkStatusWidget.buildStatusWidget(context, controller, status);
-}
-```
 
 ## 进度
 
-目前正处于初始开发阶段,可能有各种问题,欢迎提出,但不一定会实现,也不一定会修改 😌
+IjkMediaController  添加新属性  isNomal  //是否是单个视频（用于区分视频与列表默认是true）
+主要解决在视频列表中要禁止上下手势滑动
+在example的自定义布局中添加新属性：
 
-最初准备参考官方 video_player 的 api 方式进行开发,但是觉得调用的方式比较奇怪
-
-需要自定义 LifeCycle 进行管理,而且自定义控制器不太方便,遂决定重写 api 的代码结构,同时清晰逻辑
-
-目前属于公开测试使用阶段,不保证不出 bug,也不保证今后 api 不发生重大变更
-
-目前的进度可以查看[TODOLIST](https://github.com/CaiJingLong/flutter_ijkplayer/blob/master/TODOLIST.md)
-
-UI 控制功能包含常见的播放停止,手势拖动
-
+DefaultIJKControllerWidget
+ //新添加控制器属性   广告用
+  final String adimageUrl; //广告图片
+  final String adTitle; //广告标题
+  final double adrevealTime; //显示时间
+  final double addisappearTime; //消失时间
+  final bool isShowAD; //是否显示广告  true  //显示  false 隐藏
+  final bool isShowRatio; //是否显示分辨率的选项  true  //显示  false 隐藏
+  final String videoTitleTxT; //视频标题 
 ## LICENSE
 
 MIT

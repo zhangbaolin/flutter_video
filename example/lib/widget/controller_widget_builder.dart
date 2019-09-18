@@ -5,24 +5,41 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_video/flutter_video.dart';
-import 'package:flutter_video/src/helper/full_screen_helper.dart';
-import 'package:flutter_video/src/helper/logutil.dart';
-import 'package:flutter_video/src/helper/time_helper.dart';
-import 'package:flutter_video/src/helper/ui_helper.dart';
-import 'package:flutter_video/src/route/fullscreen_route.dart';
-import 'package:flutter_video/src/widget/progress_bar.dart';
+import 'package:ijkplayer_example/widget/full_screen_helper.dart';
+import 'package:ijkplayer_example/widget/fullscreen_route.dart';
+import 'package:ijkplayer_example/widget/progress_bar.dart';
+import 'package:ijkplayer_example/widget/time_helper.dart';
+import 'package:ijkplayer_example/widget/ui_helper.dart';
+
 import 'package:orientation/orientation.dart';
 import 'package:screen/screen.dart';
 
 part 'full_screen.part.dart';
 
+/**
+ * 自定义控制器页面
+ */
 /// Using mediaController to Construct a Controller UI
 typedef Widget IJKControllerWidgetBuilder(IjkMediaController controller);
 
 /// default create IJK Controller UI
-Widget defaultBuildIjkControllerWidget(IjkMediaController controller) {
+Widget defaultBuildIjkControllerWidget(IjkMediaController controller,
+    {String adimageUrl,
+    String adTitle,
+    double adrevealTime,
+    double addisappearTime,
+    bool isShowAD,
+    bool isShowRatio,
+    String videoTitleTxT}) {
   return DefaultIJKControllerWidget(
     controller: controller,
+    adimageUrl: adimageUrl == null ? "assets/asd.png" : adimageUrl,
+    adTitle: adTitle == null ? "assets/asd.png" : adimageUrl,
+    adrevealTime: adrevealTime == null ? 50 : adrevealTime,
+    addisappearTime: addisappearTime == null ? 100 : addisappearTime,
+    isShowAD: isShowAD == null ? true : isShowAD,
+    isShowRatio: isShowRatio == null ? true : isShowRatio,
+    videoTitleTxT: videoTitleTxT == null ? "视频标题" : videoTitleTxT,
     fullscreenControllerWidgetBuilder: (ctl) =>
         buildFullscreenMediaController(ctl),
   );
@@ -58,39 +75,60 @@ class DefaultIJKControllerWidget extends StatefulWidget {
 
   /// See [FullScreenType]
   final FullScreenType fullScreenType;
+  //新添加控制器属性   广告用
+  final String adimageUrl; //广告图片
+  final String adTitle; //广告标题
+  final double adrevealTime; //显示时间
+  final double addisappearTime; //消失时间
+  final bool isShowAD; //是否显示广告  true  //显示  false 隐藏
+  final bool isShowRatio; //是否显示分辨率的选项  true  //显示  false 隐藏
+  final String videoTitleTxT; //视频标题
 
   /// The UI of the controller.
-  const DefaultIJKControllerWidget({
-    Key key,
-    @required this.controller,
-    this.doubleTapPlay = false,
-    this.verticalGesture = true,
-    this.horizontalGesture = true,
-    this.volumeType = VolumeType.system,
-    this.playWillPauseOther = true,
-    this.currentFullScreenState = false,
-    this.showFullScreenButton = true,
-    this.fullscreenControllerWidgetBuilder,
-    this.fullScreenType = FullScreenType.rotateBox,
-  }) : super(key: key);
+  const DefaultIJKControllerWidget(
+      {Key key,
+      @required this.controller,
+      this.doubleTapPlay = false,
+      this.verticalGesture = true,
+      this.horizontalGesture = true,
+      this.volumeType = VolumeType.system,
+      this.playWillPauseOther = true,
+      this.currentFullScreenState = false,
+      this.showFullScreenButton = true,
+      this.fullscreenControllerWidgetBuilder,
+      this.fullScreenType = FullScreenType.rotateBox,
+      this.adimageUrl = "assets/asd.png",
+      this.adTitle = "嗯嗯这是广告",
+      this.adrevealTime = 10,
+      this.addisappearTime = 50,
+      this.isShowAD = true,
+      this.isShowRatio = true,
+      this.videoTitleTxT = "视频标题"})
+      : super(key: key);
 
   @override
   _DefaultIJKControllerWidgetState createState() =>
       _DefaultIJKControllerWidgetState();
 
-  DefaultIJKControllerWidget copyWith({
-    Key key,
-    IjkMediaController controller,
-    bool doubleTapPlay,
-    bool verticalGesture,
-    bool horizontalGesture,
-    VolumeType volumeType,
-    bool playWillPauseOther,
-    bool currentFullScreenState,
-    bool showFullScreenButton,
-    IJKControllerWidgetBuilder fullscreenControllerWidgetBuilder,
-    FullScreenType fullScreenType,
-  }) {
+  DefaultIJKControllerWidget copyWith(
+      {Key key,
+      IjkMediaController controller,
+      bool doubleTapPlay,
+      bool verticalGesture,
+      bool horizontalGesture,
+      VolumeType volumeType,
+      bool playWillPauseOther,
+      bool currentFullScreenState,
+      bool showFullScreenButton,
+      IJKControllerWidgetBuilder fullscreenControllerWidgetBuilder,
+      FullScreenType fullScreenType,
+      String adimageUrl,
+      String adTitle,
+      double adrevealTime,
+      double addisappearTime,
+      bool isShowAD,
+      bool isShowRatio,
+      String videoTitleTxT}) {
     return DefaultIJKControllerWidget(
       controller: controller ?? this.controller,
       doubleTapPlay: doubleTapPlay ?? this.doubleTapPlay,
@@ -105,6 +143,13 @@ class DefaultIJKControllerWidget extends StatefulWidget {
       showFullScreenButton: showFullScreenButton ?? this.showFullScreenButton,
       verticalGesture: verticalGesture ?? this.verticalGesture,
       fullScreenType: fullScreenType ?? this.fullScreenType,
+      adimageUrl: adimageUrl ?? this.adimageUrl,
+      adTitle: adTitle ?? this.adTitle,
+      adrevealTime: adrevealTime ?? this.adrevealTime,
+      addisappearTime: addisappearTime ?? this.addisappearTime,
+      isShowAD: isShowAD ?? this.isShowAD,
+      isShowRatio: isShowRatio ?? this.isShowRatio,
+      videoTitleTxT: videoTitleTxT ?? this.videoTitleTxT,
     );
   }
 }
@@ -131,7 +176,7 @@ class _DefaultIJKControllerWidgetState extends State<DefaultIJKControllerWidget>
   Timer progressTimer;
 
   StreamSubscription controllerSubscription;
-//新添加计时器
+//新添加计时器  控制层的显示与隐藏   默认控制层显示后  5秒钟自动隐藏
   Timer bottomBarTimer;
   Timer firstbottomTimer;
   //新添加属性
@@ -139,23 +184,34 @@ class _DefaultIJKControllerWidgetState extends State<DefaultIJKControllerWidget>
   bool isShowad = false; //是否显示广告
   bool isSeeselectredou = true;
 
-  // //添加广告动画
-  // //动画控制器
-  // AnimationController animationController;
-  // Animation<Offset> animation;
+  //添加广告动画
+  //动画控制器
+  AnimationController animationController;
+  Animation<Offset> animation;
+  //广告显示时间 广告弹出时间  广告消失时间
+  Timer adbeginTimer;
+  Timer adendTimer;
   var value;
+  String videoRatioTxT = "高清"; //分辨率设置
   @override
   void initState() {
     super.initState();
+
     startTimer();
     controllerSubscription =
         controller.textureIdStream.listen(_onTextureIdChange);
     isShowbottomBar();
     //保持屏幕常亮
     Screen.keepOn(true);
-    //adAnimation();
+    adAnimation();
+    //判断是否显示广告
+    if (widget.isShowAD) {
+      adbeginAnimation();
+      adendAnimation();
+    }
   }
 
+  //是否显示底部
   void isShowbottomBar() {
     firstbottomTimer = Timer.periodic(Duration(seconds: 5), (timer) {
       if (!isShow) {
@@ -179,17 +235,39 @@ class _DefaultIJKControllerWidgetState extends State<DefaultIJKControllerWidget>
     }
   }
 
-//   adAnimation() {
-//     animationController =
-//         AnimationController(duration: const Duration(seconds: 2), vsync: this);
-//     //动画开始、结束、向前移动或向后移动时会调用StatusListener
+//广告动画
+  adAnimation() {
+    animationController =
+        AnimationController(duration: const Duration(seconds: 2), vsync: this);
+    animation = Tween(begin: Offset(-1, 0), end: Offset(0, 0))
+        .animate(animationController);
+  }
 
-//     animation = Tween(begin: Offset(-1, 0), end: Offset(0, 0))
-//         .animate(animationController);
+//开始执行广告动画
+  adbeginAnimation() {
+    adbeginTimer =
+        Timer.periodic(Duration(seconds: widget.adrevealTime.toInt()), (timer) {
+      //开始执行动画
+      animationController.forward();
+      if (adbeginTimer != null) {
+        adbeginTimer.cancel();
+        adbeginTimer = null;
+      }
+    });
+  }
 
-// //开始执行动画
-//     animationController.forward();
-//   }
+//结束广告动画
+  adendAnimation() {
+    adendTimer = Timer.periodic(
+        Duration(seconds: widget.addisappearTime.toInt()), (timer) {
+      //开始执行动画
+      animationController.reverse();
+      if (adbeginTimer != null) {
+        adendTimer.cancel();
+        adendTimer = null;
+      }
+    });
+  }
 
   @override
   void deactivate() {
@@ -207,9 +285,18 @@ class _DefaultIJKControllerWidgetState extends State<DefaultIJKControllerWidget>
       firstbottomTimer = null;
     }
 
-    // if (animationController != null) {
-    //   animationController.dispose();
-    // }
+    if (animationController != null) {
+      animationController.dispose();
+    }
+
+    if (adbeginTimer != null) {
+      adbeginTimer.cancel();
+      adbeginTimer = null;
+    }
+    if (adendTimer != null) {
+      adendTimer.cancel();
+      adendTimer = null;
+    }
     //取消屏幕活性
     Screen.keepOn(false);
     controllerSubscription.cancel();
@@ -305,7 +392,7 @@ class _DefaultIJKControllerWidgetState extends State<DefaultIJKControllerWidget>
               offstage: isShow,
               child: buildPortrait(info),
             ),
-          //  adbuild(), //广告
+            adbuild(), //广告
           ],
         );
       },
@@ -313,41 +400,50 @@ class _DefaultIJKControllerWidgetState extends State<DefaultIJKControllerWidget>
   }
 
 //广告
-  // Widget adbuild() {
-  //   return Align(
-  //     alignment: Alignment.centerLeft,
-  //     child: SlideTransition(
-  //       position: animation,
-  //       //将要执行动画的子view
-  //       child: Stack(
-  //         children: <Widget>[
-  //           Container(
-  //             alignment: Alignment.center,
-  //             width: 150,
-  //             height: 80,
-  //             color: Colors.green,
-  //             child: Text(
-  //               "这是一个广告啊",
-  //               style: TextStyle(color: Colors.white, fontSize: 15),
-  //             ),
-  //           ),
-  //           Container(
-  //             width: 150,
-  //             height: 80,
-  //             color: Colors.orange,
-  //             alignment: Alignment.topRight,
-  //             child: GestureDetector(
-  //               onTap: () {
-  //                 animationController.reverse();
-  //               },
-  //               child: Icon(Icons.delete_sweep, color: Colors.white, size: 20),
-  //             ),
-  //           )
-  //         ],
-  //       ),
-  //     ),
-  //   );
-  // }
+  Widget adbuild() {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: SlideTransition(
+        position: animation,
+        //将要执行动画的子view
+        child: Stack(
+          children: <Widget>[
+            Container(
+              alignment: Alignment.center,
+              width: 150,
+              height: 80,
+              child: Image(
+                image: AssetImage(widget.adimageUrl),
+                fit: BoxFit.cover,
+                width: 150,
+                height: 80,
+              ),
+            ),
+            Container(
+              alignment: Alignment.center,
+              width: 150,
+              height: 80,
+              child: Text(
+                "${widget.adTitle}",
+                style: TextStyle(color: Colors.white, fontSize: 15),
+              ),
+            ),
+            Container(
+              width: 150,
+              height: 80,
+              alignment: Alignment.topRight,
+              child: GestureDetector(
+                onTap: () {
+                  animationController.reverse();
+                },
+                child: Icon(Icons.delete_sweep, color: Colors.white, size: 20),
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
 
   Widget _buildFullScreenButton() {
     if (widget.showFullScreenButton != true) {
@@ -413,7 +509,10 @@ class _DefaultIJKControllerWidgetState extends State<DefaultIJKControllerWidget>
           fullScreenWidget: _buildFullScreenButton(),
         ),
         voiceIcon(),
-        videoTitle()
+        Offstage(
+          offstage: !widget.isShowRatio,
+          child: videoTitle(),
+        )
       ],
     );
   }
@@ -461,64 +560,71 @@ class _DefaultIJKControllerWidgetState extends State<DefaultIJKControllerWidget>
               child: Container(
                 margin: EdgeInsets.only(left: 10),
                 child: Text(
-                  "标题：今天是个好日子",
+                  "${widget.videoTitleTxT}",
                   style: TextStyle(color: Colors.white, fontSize: 12),
                 ),
               ),
             ),
-//             Container(
-//               width: 60,
-//               child: PopupMenuButton(
-// //              icon: Icon(Icons.home),
-//                 child: Text(
-//                   "高清",
-//                   style: TextStyle(color: Colors.white, fontSize: 12),
-//                 ),
-//                 tooltip: "长按提示",
-//                 initialValue: "hot",
-//                 padding: EdgeInsets.all(0.0),
-//                 itemBuilder: (BuildContext context) {
-//                   return <PopupMenuItem<String>>[
-//                     PopupMenuItem<String>(
-//                       child: Text("标准"),
-//                       value: "bz",
-//                     ),
-//                     PopupMenuItem<String>(
-//                       child: Text("高清"),
-//                       value: "gq",
-//                     ),
-//                     PopupMenuItem<String>(
-//                       child: Text("超清"),
-//                       value: "cq",
-//                     ),
-//                   ];
-//                 },
-//                 onSelected: (String action) {
-//                   switch (action) {
-//                     case "bz":
-//                       print("标准");
-//                       break;
-//                     case "gq":
-//                       print("高清");
-//                       break;
-//                     case "cq":
-//                       print("超清");
-//                       break;
-//                   }
-//                 },
-//                 onCanceled: () {
-//                   print("onCanceled");
-//                 },
-//               ),
-//             ),
-//             Container(
-//               width: 60,
-//               alignment: Alignment.center,
-//               child: Text(
-//                 "暂无",
-//                 style: TextStyle(color: Colors.white, fontSize: 12),
-//               ),
-//             ),
+            Container(
+              width: 60,
+              child: PopupMenuButton(
+//              icon: Icon(Icons.home),
+                child: Text(
+                  "$videoRatioTxT",
+                  style: TextStyle(color: Colors.white, fontSize: 12),
+                ),
+                tooltip: "长按提示",
+                initialValue: "hot",
+                padding: EdgeInsets.all(0.0),
+                itemBuilder: (BuildContext context) {
+                  return <PopupMenuItem<String>>[
+                    PopupMenuItem<String>(
+                      child: Text("标准"),
+                      value: "bz",
+                    ),
+                    PopupMenuItem<String>(
+                      child: Text("高清"),
+                      value: "gq",
+                    ),
+                    PopupMenuItem<String>(
+                      child: Text("超清"),
+                      value: "cq",
+                    ),
+                  ];
+                },
+                onSelected: (String action) {
+                  //选择并且切换视频源
+                  switch (action) {
+                    case "bz":
+                      setState(() {
+                        videoRatioTxT = "标准";
+                      });
+                      break;
+                    case "gq":
+                      setState(() {
+                        videoRatioTxT = "高清";
+                      });
+                      break;
+                    case "cq":
+                      setState(() {
+                        videoRatioTxT = "超清";
+                      });
+                      break;
+                  }
+                },
+                onCanceled: () {
+                  print("onCanceled");
+                },
+              ),
+            ),
+            // Container(
+            //   width: 60,
+            //   alignment: Alignment.center,
+            //   child: Text(
+            //     "暂无",
+            //     style: TextStyle(color: Colors.white, fontSize: 12),
+            //   ),
+            // ),
           ],
         ),
       ),
@@ -608,7 +714,7 @@ class _DefaultIJKControllerWidgetState extends State<DefaultIJKControllerWidget>
   Function onDoubleTap() {
     return widget.doubleTapPlay
         ? () {
-            LogUtils.debug("ondouble tap");
+            //  LogUtils.debug("ondouble tap");
             controller.playOrPause();
           }
         : null;

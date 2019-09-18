@@ -13,11 +13,16 @@ class IjkMediaController
   Map<TargetPlatform, Set<IjkOption>> _options = {};
 
   bool needChangeSpeed;
+  //新添加属性  是单个还是列表视频
+  bool isNomal;//  true  单个  false  列表
+  
 
   /// MediaController
   IjkMediaController({
     this.autoRotate = true,
     this.needChangeSpeed = true,
+    this.isNomal=true,
+   
   }) {
     index = IjkMediaPlayerManager().add(this);
     if (needChangeSpeed) {
@@ -228,7 +233,7 @@ class IjkMediaController
   /// [target] unit is second
   Future<void> seekTo(double target) async {
     await _plugin?.seekTo(target);
-    _ijkStatus = IjkStatus.pause;
+    _ijkStatus = IjkStatus.preparing;
     refreshVideoInfo();
   }
 
@@ -237,6 +242,7 @@ class IjkMediaController
     var videoInfo = await getVideoInfo();
     var target = videoInfo.duration * progress;
     await this.seekTo(target);
+    _ijkStatus = IjkStatus.preparing;
     refreshVideoInfo();
   }
 
@@ -247,12 +253,23 @@ class IjkMediaController
     return info;
   }
 
+
   /// request info and notify
   Future<void> refreshVideoInfo() async {
     var info = await getVideoInfo();
     _videoInfo = info;
     isPlaying = info.isPlaying;
     if (info.hasData) {
+      if (info.bufferPosition < 1.0 && info.isPlaying) {
+        _ijkStatus = IjkStatus.prepared;
+      } else {
+        if (info.currentPosition ~/ 1 == info.duration ~/ 1 &&
+            info.currentPosition != 0) {
+          _ijkStatus = IjkStatus.complete;
+        } else {
+          _ijkStatus = IjkStatus.playing;
+        }
+      }
       _videoInfoController?.add(info);
       LogUtils.verbose("onrefreshInfo = $info");
     }

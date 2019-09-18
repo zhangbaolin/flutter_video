@@ -7,6 +7,7 @@ typedef Widget StatusWidgetBuilder(
   BuildContext context,
   IjkMediaController controller,
   IjkStatus status,
+  //新添加属性 视频详情
 );
 
 /// Default IjkStatusWidget
@@ -32,6 +33,37 @@ class IjkStatusWidget extends StatelessWidget {
     );
   }
 
+  static Widget _buildProgressWidget(
+      BuildContext context, IjkMediaController controller) {
+    return Center(
+      child: Container(
+        alignment: Alignment.center,
+        color: Color.fromRGBO(0, 0, 0, 0.54),
+        width: 80,
+        height: 80,
+        child: Column(
+          children: <Widget>[
+            Container(
+              height: 50,
+              alignment: Alignment.center,
+              child: CircularProgressIndicator(
+                backgroundColor: Colors.greenAccent,
+              ),
+            ),
+            Container(
+              height: 30,
+              alignment: Alignment.center,
+              child: Text(
+                "正在加载中...",
+                style: TextStyle(color: Colors.white, fontSize: 13),
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
   static Widget buildStatusWidget(
     BuildContext context,
     IjkMediaController controller,
@@ -42,11 +74,11 @@ class IjkStatusWidget extends StatelessWidget {
     }
 
     if (status == IjkStatus.preparing) {
-      return _buildProgressWidget(context);
+      return _buildProgressWidget(context, controller);
     }
     if (status == IjkStatus.prepared) {
       //return _buildPreparedWidget(context, controller);
-       return _buildProgressWidget(context);
+      return _buildProgressWidget(context, controller);
     }
     if (status == IjkStatus.error) {
       return _buildFailWidget(context);
@@ -62,34 +94,7 @@ class IjkStatusWidget extends StatelessWidget {
     }
     return Container();
   }
- static Widget _buildProgressWidget(BuildContext context) {
-    //print("hahahahaaaaaaaaaaaaahhhhhhh$tcpSpeed");
-    //int speed = controller.videoInfo.tcpSpeed ~/ 128;
-     
-    return Center(
-      child: Container(
-        alignment: Alignment.center,
-        color: Color.fromRGBO(0, 0, 0, 0.54),
-        width: 80,
-        height: 80,
-        child: Column(
-          children: <Widget>[
-            CircularProgressIndicator(
-              backgroundColor: Colors.greenAccent,
-            ),
-            Container(
-              height: 30,
-              alignment: Alignment.center,
-              child: Text(
-                "正在加载中...",
-                style: TextStyle(color: Colors.white, fontSize: 13),
-              ),
-            )
-          ],
-        ),
-      ),
-    );
-  }
+
   // static Widget _buildPreparedWidget(
   //   BuildContext context,
   //   IjkMediaController controller,
@@ -125,8 +130,6 @@ Widget _buildCenterIconButton(IconData iconData, Function onTap) {
     ),
   );
 }
-
-
 
 Widget _buildFailWidget(BuildContext context) {
   return Center(
