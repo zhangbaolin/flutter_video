@@ -1,3 +1,6 @@
+## 0.1.5
+
+新增播放状态loading下面的 播放速度显示
 ## 0.1.4
 
 IjkMediaController  添加新属性  isNomal  //是否是单个视频（用于区分视频与列表默认是true）

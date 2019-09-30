@@ -37,8 +37,8 @@ Widget defaultBuildIjkControllerWidget(IjkMediaController controller,
     adTitle: adTitle == null ? "assets/asd.png" : adimageUrl,
     adrevealTime: adrevealTime == null ? 50 : adrevealTime,
     addisappearTime: addisappearTime == null ? 100 : addisappearTime,
-    isShowAD: isShowAD == null ? true : isShowAD,
-    isShowRatio: isShowRatio == null ? true : isShowRatio,
+    isShowAD: isShowAD == null ? false : isShowAD,
+    isShowRatio: isShowRatio == null ? false : isShowRatio,
     videoTitleTxT: videoTitleTxT == null ? "视频标题" : videoTitleTxT,
     fullscreenControllerWidgetBuilder: (ctl) =>
         buildFullscreenMediaController(ctl),
@@ -101,7 +101,7 @@ class DefaultIJKControllerWidget extends StatefulWidget {
       this.adTitle = "嗯嗯这是广告",
       this.adrevealTime = 10,
       this.addisappearTime = 50,
-      this.isShowAD = true,
+      this.isShowAD = false,
       this.isShowRatio = true,
       this.videoTitleTxT = "视频标题"})
       : super(key: key);
@@ -599,6 +599,7 @@ class _DefaultIJKControllerWidgetState extends State<DefaultIJKControllerWidget>
                       setState(() {
                         videoRatioTxT = "标准";
                       });
+                      changeVideoSource();
                       break;
                     case "gq":
                       setState(() {
@@ -629,6 +630,14 @@ class _DefaultIJKControllerWidgetState extends State<DefaultIJKControllerWidget>
         ),
       ),
     );
+  }
+
+//选择完视频分辨率后更新视频源
+  void changeVideoSource() async {
+    var dataSource = DataSource.network(
+        "https://www.sample-videos.com/video123/mp4/720/big_buck_bunny_720p_20mb.mp4",
+        headers: <String, String>{});
+    await controller.setDataSource(dataSource,autoPlay: true);
   }
 
   Widget createTooltipWidgetWrapper(Widget widget) {

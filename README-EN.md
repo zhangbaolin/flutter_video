@@ -426,6 +426,10 @@ IJKPlayer(
 );
 ```
 
+```dart
+0.1.5
+新增播放状态loading下面的 播放速度显示
+```
 ## LICENSE
 
 MIT

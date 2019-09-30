@@ -35,6 +35,23 @@ class IjkStatusWidget extends StatelessWidget {
 
   static Widget _buildProgressWidget(
       BuildContext context, IjkMediaController controller) {
+    print("视频播放的速度：${controller.videoInfo.tcpSpeed}");
+    int tcpSpeed = 0;
+    if (controller.videoInfo.tcpSpeed == null) {
+      tcpSpeed = 1024;
+    } else {
+      tcpSpeed = controller.videoInfo.tcpSpeed;
+    }
+
+    List<String> unitArr = List()..add('B/S')..add('K/S')..add('M/S')..add('G/S');
+    int index = 0;
+    while (tcpSpeed > 1024) {
+      index++;
+      tcpSpeed = tcpSpeed ~/ 1024;
+    }
+    String size = tcpSpeed.toStringAsFixed(0);
+    String speed = size + unitArr[index];
+
     return Center(
       child: Container(
         alignment: Alignment.center,
@@ -45,6 +62,7 @@ class IjkStatusWidget extends StatelessWidget {
           children: <Widget>[
             Container(
               height: 50,
+              width: 120,
               alignment: Alignment.center,
               child: CircularProgressIndicator(
                 backgroundColor: Colors.greenAccent,
@@ -54,7 +72,7 @@ class IjkStatusWidget extends StatelessWidget {
               height: 30,
               alignment: Alignment.center,
               child: Text(
-                "正在加载中...",
+                "$speed",
                 style: TextStyle(color: Colors.white, fontSize: 13),
               ),
             )

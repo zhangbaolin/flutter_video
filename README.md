@@ -443,6 +443,10 @@ DefaultIJKControllerWidget
   final bool isShowAD; //是否显示广告  true  //显示  false 隐藏
   final bool isShowRatio; //是否显示分辨率的选项  true  //显示  false 隐藏
   final String videoTitleTxT; //视频标题 
+
+
+0.1.5
+新增播放状态loading下面的 播放速度显示
 ## LICENSE
 
 MIT
