@@ -35,51 +35,62 @@ class IjkStatusWidget extends StatelessWidget {
 
   static Widget _buildProgressWidget(
       BuildContext context, IjkMediaController controller) {
-    print("视频播放的速度：${controller.videoInfo.tcpSpeed}");
-    int tcpSpeed = 0;
+    var content;
+    print(controller);
     if (controller.videoInfo.tcpSpeed == null) {
-      tcpSpeed = 1024;
+      content = Container();
     } else {
-      tcpSpeed = controller.videoInfo.tcpSpeed;
-    }
+      print("视频播放的速度：${controller.videoInfo.tcpSpeed}");
+      int tcpSpeed = 0;
+      if (controller.videoInfo.tcpSpeed == null) {
+        tcpSpeed = 0;
+      } else {
+        tcpSpeed = controller.videoInfo.tcpSpeed;
+      }
 
-    List<String> unitArr = List()..add('B/S')..add('K/S')..add('M/S')..add('G/S');
-    int index = 0;
-    while (tcpSpeed > 1024) {
-      index++;
-      tcpSpeed = tcpSpeed ~/ 1024;
-    }
-    String size = tcpSpeed.toStringAsFixed(0);
-    String speed = size + unitArr[index];
+      List<String> unitArr = List()
+        ..add('B/S')
+        ..add('K/S')
+        ..add('M/S')
+        ..add('G/S');
+      int index = 0;
+      while (tcpSpeed > 1024) {
+        index++;
+        tcpSpeed = tcpSpeed ~/ 1024;
+      }
+      String size = tcpSpeed.toStringAsFixed(0);
+      String speed = size + unitArr[index];
 
-    return Center(
-      child: Container(
-        alignment: Alignment.center,
-        color: Color.fromRGBO(0, 0, 0, 0.54),
-        width: 80,
-        height: 80,
-        child: Column(
-          children: <Widget>[
-            Container(
-              height: 50,
-              width: 120,
-              alignment: Alignment.center,
-              child: CircularProgressIndicator(
-                backgroundColor: Colors.greenAccent,
+      content = Center(
+        child: Container(
+          alignment: Alignment.center,
+          color: Color.fromRGBO(0, 0, 0, 0.54),
+          width: 80,
+          height: 80,
+          child: Column(
+            children: <Widget>[
+              Container(
+                height: 50,
+                width: 120,
+                alignment: Alignment.center,
+                child: CircularProgressIndicator(
+                  backgroundColor: Colors.greenAccent,
+                ),
               ),
-            ),
-            Container(
-              height: 30,
-              alignment: Alignment.center,
-              child: Text(
-                "$speed",
-                style: TextStyle(color: Colors.white, fontSize: 13),
-              ),
-            )
-          ],
+              Container(
+                height: 30,
+                alignment: Alignment.center,
+                child: Text(
+                  "$speed",
+                  style: TextStyle(color: Colors.white, fontSize: 13),
+                ),
+              )
+            ],
+          ),
         ),
-      ),
-    );
+      );
+    }
+    return content;
   }
 
   static Widget buildStatusWidget(
@@ -96,6 +107,7 @@ class IjkStatusWidget extends StatelessWidget {
     }
     if (status == IjkStatus.prepared) {
       //return _buildPreparedWidget(context, controller);
+
       return _buildProgressWidget(context, controller);
     }
     if (status == IjkStatus.error) {

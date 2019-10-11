@@ -384,7 +384,23 @@ class _DefaultIJKControllerWidgetState extends State<DefaultIJKControllerWidget>
       builder: (context, snapshot) {
         var info = snapshot.data;
         if (info == null || !info.hasData) {
-          return Container();
+          print("info是空的");
+          return Container(
+            color: Color.fromRGBO(0, 0, 0, 0),
+            child: Center(
+              child: Text("正在加速缓冲中",style: TextStyle(color: Colors.white,fontSize: 20),),
+            ),
+          );
+        } else {
+          if (!info.isPlaying) {
+            print("还没开始播放呢"); 
+            return Container(
+              color: Color.fromRGBO(0, 0, 0, 0),
+              child: Center(
+               child: Text("正在加速缓冲中",style: TextStyle(color: Colors.white,fontSize: 20),),
+              ),
+            );
+          }
         }
         return Stack(
           children: <Widget>[
@@ -392,7 +408,7 @@ class _DefaultIJKControllerWidgetState extends State<DefaultIJKControllerWidget>
               offstage: isShow,
               child: buildPortrait(info),
             ),
-            adbuild(), //广告
+            Container(), //广告
           ],
         );
       },
@@ -637,7 +653,7 @@ class _DefaultIJKControllerWidgetState extends State<DefaultIJKControllerWidget>
     var dataSource = DataSource.network(
         "https://www.sample-videos.com/video123/mp4/720/big_buck_bunny_720p_20mb.mp4",
         headers: <String, String>{});
-    await controller.setDataSource(dataSource,autoPlay: true);
+    await controller.setDataSource(dataSource, autoPlay: true);
   }
 
   Widget createTooltipWidgetWrapper(Widget widget) {

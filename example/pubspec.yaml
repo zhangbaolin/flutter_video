@@ -16,7 +16,7 @@ dependencies:
 
   flutter_localizations:
     sdk: flutter
-  intl: ^0.15.8
+  #intl: ^0.15.8
 
   flutter_video:
     path: ../

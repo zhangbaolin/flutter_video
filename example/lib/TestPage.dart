@@ -22,7 +22,7 @@ class _TestPageState extends State<TestPage> with WidgetsBindingObserver {
 
     WidgetsBinding.instance.addObserver(this); //添加观察者
     controller.setNetworkDataSource(
-        "http://multimedia.lx8886.com/upload/20190908051310.mp4",
+        "XXX.mp4",
         autoPlay: true);
 
     // _timer = Timer.periodic(Duration(milliseconds: 100), (timer) {
