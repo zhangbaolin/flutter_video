@@ -26,13 +26,12 @@ class ProgressBar extends StatefulWidget {
     this.playedColor = Colors.white,
     this.changeProgressHandler,
     this.tapProgressHandler,
-    this.progressFlex = 0.6,
+    this.progressFlex = 0.4,
   }) : super(key: key);
 
   @override
   _ProgressBarState createState() => _ProgressBarState();
 }
-
 class _ProgressBarState extends State<ProgressBar> {
   GlobalKey _progressKey = GlobalKey();
 

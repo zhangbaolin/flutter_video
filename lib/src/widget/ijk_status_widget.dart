@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_video/flutter_video.dart';
 
 /// Construct a Widget based on the current status.
@@ -40,14 +41,12 @@ class IjkStatusWidget extends StatelessWidget {
     if (controller.videoInfo.tcpSpeed == null) {
       content = Container();
     } else {
-      print("视频播放的速度：${controller.videoInfo.tcpSpeed}");
       int tcpSpeed = 0;
       if (controller.videoInfo.tcpSpeed == null) {
         tcpSpeed = 0;
       } else {
         tcpSpeed = controller.videoInfo.tcpSpeed;
       }
-
       List<String> unitArr = List()
         ..add('B/S')
         ..add('K/S')
@@ -73,8 +72,9 @@ class IjkStatusWidget extends StatelessWidget {
                 height: 50,
                 width: 120,
                 alignment: Alignment.center,
-                child: CircularProgressIndicator(
-                  backgroundColor: Colors.greenAccent,
+                child: SpinKitFadingCircle(
+                  color: Colors.white,
+                  size: 40,
                 ),
               ),
               Container(

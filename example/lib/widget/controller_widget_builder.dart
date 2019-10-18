@@ -5,10 +5,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_video/flutter_video.dart';
+import 'package:ijkplayer_example/widget/PortraitController.dart';
 import 'package:ijkplayer_example/widget/full_screen_helper.dart';
 import 'package:ijkplayer_example/widget/fullscreen_route.dart';
-import 'package:ijkplayer_example/widget/progress_bar.dart';
-import 'package:ijkplayer_example/widget/time_helper.dart';
 import 'package:ijkplayer_example/widget/ui_helper.dart';
 
 import 'package:orientation/orientation.dart';
@@ -155,8 +154,7 @@ class DefaultIJKControllerWidget extends StatefulWidget {
 }
 
 class _DefaultIJKControllerWidgetState extends State<DefaultIJKControllerWidget>
-    with TickerProviderStateMixin
-    implements TooltipDelegate {
+    with TickerProviderStateMixin {
   IjkMediaController get controller => widget.controller;
 
   GlobalKey currentKey = GlobalKey();
@@ -193,22 +191,17 @@ class _DefaultIJKControllerWidgetState extends State<DefaultIJKControllerWidget>
   Timer adendTimer;
   var value;
   String videoRatioTxT = "高清"; //分辨率设置
+  Widget showIconWidget;
   @override
   void initState() {
     super.initState();
-
+      showIconWidget=null;
     startTimer();
     controllerSubscription =
         controller.textureIdStream.listen(_onTextureIdChange);
-    isShowbottomBar();
+    //isShowbottomBar();
     //保持屏幕常亮
     Screen.keepOn(true);
-    adAnimation();
-    //判断是否显示广告
-    if (widget.isShowAD) {
-      adbeginAnimation();
-      adendAnimation();
-    }
   }
 
   //是否显示底部
@@ -227,46 +220,11 @@ class _DefaultIJKControllerWidgetState extends State<DefaultIJKControllerWidget>
   }
 
   void _onTextureIdChange(int textureId) {
-    // LogUtils.debug("onTextureChange $textureId");
     if (textureId != null) {
       startTimer();
     } else {
       stopTimer();
     }
-  }
-
-//广告动画
-  adAnimation() {
-    animationController =
-        AnimationController(duration: const Duration(seconds: 2), vsync: this);
-    animation = Tween(begin: Offset(-1, 0), end: Offset(0, 0))
-        .animate(animationController);
-  }
-
-//开始执行广告动画
-  adbeginAnimation() {
-    adbeginTimer =
-        Timer.periodic(Duration(seconds: widget.adrevealTime.toInt()), (timer) {
-      //开始执行动画
-      animationController.forward();
-      if (adbeginTimer != null) {
-        adbeginTimer.cancel();
-        adbeginTimer = null;
-      }
-    });
-  }
-
-//结束广告动画
-  adendAnimation() {
-    adendTimer = Timer.periodic(
-        Duration(seconds: widget.addisappearTime.toInt()), (timer) {
-      //开始执行动画
-      animationController.reverse();
-      if (adbeginTimer != null) {
-        adendTimer.cancel();
-        adendTimer = null;
-      }
-    });
   }
 
   @override
@@ -365,42 +323,20 @@ class _DefaultIJKControllerWidgetState extends State<DefaultIJKControllerWidget>
   }
 
   Widget buildContent() {
-    // if (!isShow) {
-    //   return Container();
-    // }
-    // return StreamBuilder<VideoInfo>(
-    //   stream: controller.videoInfoStream,
-    //   builder: (context, snapshot) {
-    //     var info = snapshot.data;
-    //     if (info == null || !info.hasData) {
-    //       return Container();
-    //     }
-    //     return buildPortrait(info);
-    //   },
-    // );
-
     return StreamBuilder<VideoInfo>(
       stream: controller.videoInfoStream,
       builder: (context, snapshot) {
         var info = snapshot.data;
         if (info == null || !info.hasData) {
-          print("info是空的");
           return Container(
             color: Color.fromRGBO(0, 0, 0, 0),
             child: Center(
-              child: Text("正在加速缓冲中",style: TextStyle(color: Colors.white,fontSize: 20),),
+              child: Text(
+                "正在加速缓冲中",
+                style: TextStyle(color: Colors.white, fontSize: 20),
+              ),
             ),
           );
-        } else {
-          if (!info.isPlaying) {
-            print("还没开始播放呢"); 
-            return Container(
-              color: Color.fromRGBO(0, 0, 0, 0),
-              child: Center(
-               child: Text("正在加速缓冲中",style: TextStyle(color: Colors.white,fontSize: 20),),
-              ),
-            );
-          }
         }
         return Stack(
           children: <Widget>[
@@ -409,55 +345,11 @@ class _DefaultIJKControllerWidgetState extends State<DefaultIJKControllerWidget>
               child: buildPortrait(info),
             ),
             Container(), //广告
+            //显示声音  快进后退的
+            buildShowIcon()
           ],
         );
       },
-    );
-  }
-
-//广告
-  Widget adbuild() {
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: SlideTransition(
-        position: animation,
-        //将要执行动画的子view
-        child: Stack(
-          children: <Widget>[
-            Container(
-              alignment: Alignment.center,
-              width: 150,
-              height: 80,
-              child: Image(
-                image: AssetImage(widget.adimageUrl),
-                fit: BoxFit.cover,
-                width: 150,
-                height: 80,
-              ),
-            ),
-            Container(
-              alignment: Alignment.center,
-              width: 150,
-              height: 80,
-              child: Text(
-                "${widget.adTitle}",
-                style: TextStyle(color: Colors.white, fontSize: 15),
-              ),
-            ),
-            Container(
-              width: 150,
-              height: 80,
-              alignment: Alignment.topRight,
-              child: GestureDetector(
-                onTap: () {
-                  animationController.reverse();
-                },
-                child: Icon(Icons.delete_sweep, color: Colors.white, size: 20),
-              ),
-            )
-          ],
-        ),
-      ),
     );
   }
 
@@ -467,73 +359,76 @@ class _DefaultIJKControllerWidgetState extends State<DefaultIJKControllerWidget>
     }
     var isFull = widget.currentFullScreenState;
 
-    // IJKControllerWidgetBuilder fullscreenBuilder =
-    //     widget.fullscreenControllerWidgetBuilder ??
-    //         (ctx) => FullIJKControllerWidget(
-    //               controller: controller,
-    //             );
-
     IJKControllerWidgetBuilder fullscreenBuilder =
         widget.fullscreenControllerWidgetBuilder ??
             (ctx) => widget.copyWith(currentFullScreenState: true);
 
-    return IconButton(
-      color: Colors.white,
-      icon: Icon(isFull ? Icons.fullscreen_exit : Icons.fullscreen),
-      onPressed: () async {
-        if (isFull) {
-          Navigator.pop(context);
-
-          // 强制竖屏
-          SystemChrome.setPreferredOrientations(
-              [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
-          if (Platform.isIOS) {
-            OrientationPlugin.forceOrientation(DeviceOrientation.portraitUp);
-          }
-          SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
-        } else {
-          showFullScreenIJKPlayer(
-            context,
-            controller,
-            fullscreenControllerWidgetBuilder: fullscreenBuilder,
-            fullScreenType: widget.fullScreenType,
-          );
-          SystemChrome.setPreferredOrientations([
-            DeviceOrientation.landscapeRight,
-            DeviceOrientation.landscapeLeft,
-          ]);
-          if (Platform.isIOS) {
-            OrientationPlugin.forceOrientation(DeviceOrientation.landscapeLeft);
-          }
-          SystemChrome.setEnabledSystemUIOverlays([]);
-        }
+    return GestureDetector(
+      onTap: () {
+        clickFullScreenBtn(isFull, fullscreenBuilder);
       },
+      child: Container(
+        width: 25,
+        height: 25,
+        alignment: Alignment.center,
+        child: Icon(
+          isFull ? Icons.fullscreen_exit : Icons.fullscreen,
+          color: Colors.white,
+          size: 25,
+        ),
+      ),
     );
   }
 
-  int _overlayTurns = 0;
+  clickFullScreenBtn(
+      bool isFull, IJKControllerWidgetBuilder fullscreenBuilder) {
+    if (isFull) {
+      Navigator.pop(context);
+
+      // 强制竖屏
+      SystemChrome.setPreferredOrientations(
+          [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+      if (Platform.isIOS) {
+        OrientationPlugin.forceOrientation(DeviceOrientation.portraitUp);
+      }
+      SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
+    } else {
+      showFullScreenIJKPlayer(
+        context,
+        controller,
+        fullscreenControllerWidgetBuilder: fullscreenBuilder,
+        fullScreenType: widget.fullScreenType,
+      );
+      SystemChrome.setPreferredOrientations([
+        DeviceOrientation.landscapeRight,
+        DeviceOrientation.landscapeLeft,
+      ]);
+      if (Platform.isIOS) {
+        OrientationPlugin.forceOrientation(DeviceOrientation.landscapeLeft);
+      }
+      SystemChrome.setEnabledSystemUIOverlays([]);
+    }
+  }
+
 
   Widget buildPortrait(VideoInfo info) {
-    _overlayTurns = FullScreenHelper.getQuarterTurns(info, context);
     return Stack(
       children: <Widget>[
         PortraitController(
           controller: controller,
           info: info,
-          tooltipDelegate: this,
           playWillPauseOther: widget.playWillPauseOther,
           fullScreenWidget: _buildFullScreenButton(),
         ),
         voiceIcon(),
-        Offstage(
-          offstage: !widget.isShowRatio,
-          child: videoTitle(),
-        )
+        // Offstage(
+        //   offstage: !widget.isShowRatio,
+        //   child: videoTitle(),
+        // )
       ],
     );
   }
 
-  OverlayEntry _tipOverlay;
   //音量按钮
   Widget voiceIcon() {
     return Container(
@@ -584,7 +479,6 @@ class _DefaultIJKControllerWidgetState extends State<DefaultIJKControllerWidget>
             Container(
               width: 60,
               child: PopupMenuButton(
-//              icon: Icon(Icons.home),
                 child: Text(
                   "$videoRatioTxT",
                   style: TextStyle(color: Colors.white, fontSize: 12),
@@ -634,14 +528,6 @@ class _DefaultIJKControllerWidgetState extends State<DefaultIJKControllerWidget>
                 },
               ),
             ),
-            // Container(
-            //   width: 60,
-            //   alignment: Alignment.center,
-            //   child: Text(
-            //     "暂无",
-            //     style: TextStyle(color: Colors.white, fontSize: 12),
-            //   ),
-            // ),
           ],
         ),
       ),
@@ -656,59 +542,26 @@ class _DefaultIJKControllerWidgetState extends State<DefaultIJKControllerWidget>
     await controller.setDataSource(dataSource, autoPlay: true);
   }
 
-  Widget createTooltipWidgetWrapper(Widget widget) {
-    var typography = Typography(platform: TargetPlatform.android);
-    var theme = typography.white;
-    const style = const TextStyle(
-      fontSize: 15.0,
-      color: Colors.white,
-      fontWeight: FontWeight.normal,
-    );
-    var mergedTextStyle = theme.body2.merge(style);
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.5),
-        borderRadius: BorderRadius.circular(20.0),
-      ),
-      height: 100.0,
-      width: 100.0,
-      child: DefaultTextStyle(
-        child: widget,
-        style: mergedTextStyle,
-      ),
-    );
-  }
-
-  void showTooltip(Widget widget) {
-    hideTooltip();
-    _tipOverlay = OverlayEntry(
-      builder: (BuildContext context) {
-        Widget w = IgnorePointer(
-          child: Center(
-            child: widget,
-          ),
-        );
-
-        if (this.widget.fullScreenType == FullScreenType.rotateBox &&
-            this.widget.currentFullScreenState &&
-            _overlayTurns != 0) {
-          w = RotatedBox(
-            child: w,
-            quarterTurns: _overlayTurns,
+//显示声音  快进后退的
+  //显示声音  快进后退的
+  buildShowIcon() {
+    return showIconWidget == null
+        ? Container()
+        : Container(
+            alignment: Alignment.center,
+            child: Container(
+              height: 80,
+              width: 80,
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.4),
+                borderRadius: BorderRadius.circular(20.0),
+              ),
+              child: showIconWidget,
+            ),
           );
-        }
-
-        return w;
-      },
-    );
-    Overlay.of(context).insert(_tipOverlay);
   }
 
-  void hideTooltip() {
-    _tipOverlay?.remove();
-
-    _tipOverlay = null;
-  }
+  
 
   _ProgressCalculator _calculator;
 
@@ -739,7 +592,6 @@ class _DefaultIJKControllerWidgetState extends State<DefaultIJKControllerWidget>
   Function onDoubleTap() {
     return widget.doubleTapPlay
         ? () {
-            //  LogUtils.debug("ondouble tap");
             controller.playOrPause();
           }
         : null;
@@ -777,15 +629,22 @@ class _DefaultIJKControllerWidgetState extends State<DefaultIJKControllerWidget>
         Text(
           updateText,
           textAlign: TextAlign.center,
+          style: TextStyle(color: Colors.white),
         ),
       ],
     );
+  setState(() {
+    showIconWidget=w; 
+  });
 
-    showTooltip(createTooltipWidgetWrapper(w));
+    //   showTooltip(createTooltipWidgetWrapper(w));
   }
 
   void _onHorizontalDragEnd(DragEndDetails details) async {
-    hideTooltip();
+    setState(() {
+      showIconWidget=null; 
+    });
+
     var targetSeek = _calculator?.getTargetSeek(details);
     _calculator = null;
     if (targetSeek == null) {
@@ -810,12 +669,15 @@ class _DefaultIJKControllerWidgetState extends State<DefaultIJKControllerWidget>
     leftVerticalDrag = dx / width <= 0.5;
   }
 
+/*
+ *横向滑动 
+ */
   void _onVerticalDragUpdate(DragUpdateDetails details) async {
     if (verticalDragging == false) return;
 
     String text = "";
     IconData iconData = Icons.volume_up;
-    print('滑动的详情：${details.globalPosition.dy}');
+
     if (leftVerticalDrag == false) {
       if (details.delta.dy > 0 && details.globalPosition.dy % 2 == 0) {
         await volumeDown();
@@ -873,21 +735,30 @@ class _DefaultIJKControllerWidgetState extends State<DefaultIJKControllerWidget>
         ),
         Padding(
           padding: const EdgeInsets.only(top: 10.0),
-          child: Text(text),
+          child: Text(text,style: TextStyle(color: Colors.white),),
         ),
       ],
     );
-
-    showTooltip(createTooltipWidgetWrapper(column));
+    setState(() {
+      showIconWidget=column; 
+    });
+    //   showTooltip(createTooltipWidgetWrapper(column));
   }
 
+/*
+ *横向滑动结束 
+ */
   void _onVerticalDragEnd(DragEndDetails details) async {
     verticalDragging = false;
     leftVerticalDrag = null;
-    hideTooltip();
 
+     setState(() {
+      showIconWidget=null; 
+    });
     Future.delayed(const Duration(milliseconds: 2000), () {
-      hideTooltip();
+      setState(() {
+      showIconWidget=null; 
+    });
     });
   }
 
@@ -927,7 +798,6 @@ class _DefaultIJKControllerWidgetState extends State<DefaultIJKControllerWidget>
     }
   }
 }
-
 class _ProgressCalculator {
   DragStartDetails startDetails;
   VideoInfo info;
@@ -956,186 +826,6 @@ class _ProgressCalculator {
   double getOffsetPosition() {
     return dx / 10;
   }
-}
-
-class PortraitController extends StatelessWidget {
-  final IjkMediaController controller;
-  final VideoInfo info;
-  final TooltipDelegate tooltipDelegate;
-  final bool playWillPauseOther;
-  final Widget fullScreenWidget;
-
-  const PortraitController({
-    Key key,
-    this.controller,
-    this.info,
-    this.tooltipDelegate,
-    this.playWillPauseOther = true,
-    this.fullScreenWidget,
-  }) : super(key: key);
-
-  bool get haveTime {
-    return info.hasData && info.duration > 0;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (!info.hasData) {
-      return Container();
-    }
-    Widget bottomBar = buildBottomBar(context);
-    return Column(
-      children: <Widget>[
-        Expanded(
-          child: Container(),
-        ),
-        bottomBar,
-      ],
-    );
-  }
-
-  Widget buildBottomBar(BuildContext context) {
-    var currentTime = buildCurrentText();
-    var maxTime = buildMaxTimeText();
-    var progress = buildProgress(info);
-
-    var playButton = buildPlayButton(context);
-
-    var fullScreenButton = buildFullScreenButton();
-
-    Widget widget = Row(
-      children: <Widget>[
-        playButton,
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: currentTime,
-        ),
-        Expanded(child: progress),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: maxTime,
-        ),
-        fullScreenButton,
-      ],
-    );
-    widget = DefaultTextStyle(
-      style: const TextStyle(
-        color: Colors.white,
-      ),
-      child: widget,
-    );
-    widget = Container(
-      color: Colors.black.withOpacity(0.12),
-      child: widget,
-    );
-    return widget;
-  }
-
-  Widget buildProgress(VideoInfo info) {
-    if (!info.hasData || info.duration == 0) {
-      return Container();
-    }
-    return Container(
-      height: 25,
-      child: ProgressBar(
-        current: info.currentPosition,
-        max: info.duration,
-        buffered: info.bufferPosition,
-        bufferColor: Colors.green[200],
-        changeProgressHandler: (progress) async {
-          await controller.seekToProgress(progress);
-          tooltipDelegate?.hideTooltip();
-        },
-        tapProgressHandler: (progress) async {
-          // showProgressTooltip(info, progress);
-          if (controller.ijkStatus == IjkStatus.prepared ||
-              controller.ijkStatus == IjkStatus.prepared) {
-            controller.refreshVideoInfo();
-            //  print("点击了progress，修改了视频播放的状态${controller.ijkStatus}");
-          }
-          await controller.seekToProgress(progress);
-          tooltipDelegate?.hideTooltip();
-          //   print("点击了progress，修改了视频播放的状态${controller.ijkStatus}");
-        },
-      ),
-    );
-  }
-
-  buildCurrentText() {
-    return haveTime
-        ? Text(
-            TimeHelper.getTimeText(info.currentPosition),
-          )
-        : Container();
-  }
-
-  buildMaxTimeText() {
-    return haveTime
-        ? Text(
-            TimeHelper.getTimeText(info.duration),
-          )
-        : Container();
-  }
-
-  buildPlayButton(BuildContext context) {
-    return IconButton(
-      onPressed: () {
-        controller.playOrPause(pauseOther: playWillPauseOther);
-      },
-      color: Colors.white,
-      icon: Icon(info.isPlaying ? Icons.pause : Icons.play_arrow),
-      iconSize: 25.0,
-    );
-  }
-
-  void showProgressTooltip(VideoInfo info, double progress) {
-    var target = info.duration * progress;
-
-    var diff = info.currentPosition - target;
-
-    String diffString;
-    if (diff < 1 && diff > -1) {
-      diffString = "0s";
-    } else if (diff < 0) {
-      diffString = "+${TimeHelper.getTimeText(diff.abs())}";
-    } else if (diff > 0) {
-      diffString = "-${TimeHelper.getTimeText(diff.abs())}";
-    } else {
-      diffString = "0s";
-    }
-
-    Widget text = Container(
-      alignment: Alignment.center,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Text(
-            TimeHelper.getTimeText(target),
-            style: TextStyle(fontSize: 20),
-          ),
-          Container(
-            height: 10,
-          ),
-          Text(diffString),
-        ],
-      ),
-    );
-
-    var tooltip = tooltipDelegate?.createTooltipWidgetWrapper(text);
-    tooltipDelegate?.showTooltip(tooltip);
-  }
-
-  Widget buildFullScreenButton() {
-    return fullScreenWidget ?? Container();
-  }
-}
-
-abstract class TooltipDelegate {
-  void showTooltip(Widget widget);
-
-  Widget createTooltipWidgetWrapper(Widget widget);
-
-  void hideTooltip();
 }
 
 enum VolumeType {

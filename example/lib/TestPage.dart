@@ -39,9 +39,7 @@ class _TestPageState extends State<TestPage> with WidgetsBindingObserver {
     await controller.seekToProgress(0.5);
   }
 
-  //http://multimedia.lx8886.com/upload/20190908051310.mp4
-//http://app.12321hc.com/app/video0.mp4
-//rtmp://192.168.1.56/live/stream1
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -55,7 +53,7 @@ class _TestPageState extends State<TestPage> with WidgetsBindingObserver {
             ListView(
               children: <Widget>[
                 AspectRatio(
-                  aspectRatio: 3 / 2,
+                  aspectRatio: 16 / 9,
                   child: IjkPlayer(
                     mediaController: controller,
                     // textureBuilder: (context, mediaController, info) {
