@@ -63,7 +63,11 @@ class IjkStatusWidget extends StatelessWidget {
       content = Center(
         child: Container(
           alignment: Alignment.center,
-          color: Color.fromRGBO(0, 0, 0, 0.54),
+          decoration: new BoxDecoration(
+            //border: new Border.all(width: 1.0, color: Colors.red),
+            color: Color.fromRGBO(0, 0, 0, 0.54),
+            borderRadius: new BorderRadius.all(new Radius.circular(20.0)),
+          ),
           width: 80,
           height: 80,
           child: Column(

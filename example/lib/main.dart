@@ -1,9 +1,13 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_video/flutter_video.dart';
 import 'package:flutter/services.dart';
 import 'package:ijkplayer_example/EventBus.dart';
 import 'package:ijkplayer_example/TestPage.dart';
 import 'package:ijkplayer_example/VideoBean.dart';
+
+import 'package:orientation/orientation.dart';
 
 void main() {
   runApp(new MyApp());
@@ -133,6 +137,14 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
             GestureDetector(
               onTap: () {
                 bus.sendBroadcast('eventName');
+        //          SystemChrome.setPreferredOrientations([
+        //   DeviceOrientation.landscapeRight,
+        //   DeviceOrientation.landscapeLeft,
+        // ]);
+        // if (Platform.isIOS) {
+        //   OrientationPlugin.forceOrientation(DeviceOrientation.landscapeLeft);
+        // }
+        // SystemChrome.setEnabledSystemUIOverlays([]);
                 Navigator.push(context,
                     MaterialPageRoute(builder: (context) => TestPage()));
               },

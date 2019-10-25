@@ -1,9 +1,12 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_video/flutter_video.dart';
-import 'package:ijkplayer_example/widget/controller_widget_builder.dart';
+import 'package:ijkplayer_example/widget/single_controller_build.dart';
+
+import 'package:orientation/orientation.dart';
 
 class TestPage extends StatefulWidget {
   @override
@@ -19,41 +22,45 @@ class _TestPageState extends State<TestPage> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     //  SystemChrome.setEnabledSystemUIOverlays([]);
-
     WidgetsBinding.instance.addObserver(this); //添加观察者
-    controller.setNetworkDataSource(
-        "XXX.mp4",
-        autoPlay: true);
+    controller.setNetworkDataSource("http://multimedia.lx8886.com/upload/20190912174152.mp4", autoPlay: true);
 
-    // _timer = Timer.periodic(Duration(milliseconds: 100), (timer) {
-    //   print("当前的播放状态：${controller.ijkStatus}");
-    //   if (controller.ijkStatus == IjkStatus.playing) {
-    //     setPro();
-    //     _timer.cancel();
-    //     _timer = null;
-    //   }
-    // });
+    _timer = Timer.periodic(Duration(microseconds: 1000), (timer) {
+    //  print("当前的播放状态：${controller.ijkStatus}");
+      if (controller.ijkStatus == IjkStatus.playing &&
+          controller.videoInfo.currentPosition > 0) {
+        setPro();
+        _timer.cancel();
+        _timer = null;
+      }
+    });
   }
 
   void setPro() async {
-    await controller.seekToProgress(0.5);
+    await controller.seekTo(40);
   }
-
 
   @override
   Widget build(BuildContext context) {
+    double asd = (MediaQuery.of(context).size.height -
+            MediaQuery.of(context).padding.top) /
+        MediaQuery.of(context).size.width *
+        4;
     return Scaffold(
       // appBar: AppBar(
 
       //   title: Text('测试'),
       // ),
+
       body: Container(
-        child: Stack(
-          children: <Widget>[
-            ListView(
-              children: <Widget>[
-                AspectRatio(
-                  aspectRatio: 16 / 9,
+        child: Container(
+          padding: EdgeInsets.only(top: 0),
+          child: ListView(
+            children: <Widget>[
+              SafeArea(
+                child: Container(
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height,
                   child: IjkPlayer(
                     mediaController: controller,
                     // textureBuilder: (context, mediaController, info) {
@@ -74,13 +81,13 @@ class _TestPageState extends State<TestPage> with WidgetsBindingObserver {
                     //   );
                     // },
                     controllerWidgetBuilder: (mediaController) {
-                      return defaultBuildIjkControllerWidget(mediaController,adrevealTime: 1,addisappearTime: 10);
+                      return singleBuildIjkControllerWidget(mediaController);
                     },
                   ),
                 ),
-              ],
-            ),
-          ],
+              )
+            ],
+          ),
         ),
       ),
     );
@@ -107,6 +114,12 @@ class _TestPageState extends State<TestPage> with WidgetsBindingObserver {
 
   @override
   void dispose() {
+    SystemChrome.setPreferredOrientations(
+        [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+    if (Platform.isIOS) {
+      OrientationPlugin.forceOrientation(DeviceOrientation.portraitUp);
+    }
+    SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
     SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
     controller.dispose();
     WidgetsBinding.instance.removeObserver(this); //销毁观察者

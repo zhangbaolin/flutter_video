@@ -453,6 +453,9 @@ DefaultIJKControllerWidget
 1.修改控制器UI的样式大小
 2.修改滑动事件时候显示的提示框（原在屏幕中间显示，现在显示在视频播放器中间）
 3.修改加载卡顿加载时候的loading样式
+
+0.1.9
+修改视频加载loading得角度 改成圆角
 ## LICENSE
 
 MIT

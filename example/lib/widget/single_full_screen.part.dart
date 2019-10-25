@@ -1,4 +1,4 @@
-part of './controller_widget_builder.dart';
+part of './single_controller_build.dart';
 
 enum FullScreenType {
   rotateScreen,
@@ -30,7 +30,7 @@ _showFullScreenWithRotateBox(
 }) async {
   var info = await controller.getVideoInfo();
 
-  if(info!=null){
+  if(info.width!=null&&info.height!=null){
        Axis axis;
 
   if (info.width == 0 || info.height == 0) {

@@ -6,14 +6,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_video/flutter_video.dart';
 import 'package:ijkplayer_example/widget/PortraitController.dart';
-import 'package:ijkplayer_example/widget/full_screen_helper.dart';
 import 'package:ijkplayer_example/widget/fullscreen_route.dart';
 import 'package:ijkplayer_example/widget/ui_helper.dart';
 
 import 'package:orientation/orientation.dart';
 import 'package:screen/screen.dart';
 
-part 'full_screen.part.dart';
+part 'single_full_screen.part.dart';
 
 /**
  * 自定义控制器页面
@@ -22,7 +21,7 @@ part 'full_screen.part.dart';
 typedef Widget IJKControllerWidgetBuilder(IjkMediaController controller);
 
 /// default create IJK Controller UI
-Widget defaultBuildIjkControllerWidget(IjkMediaController controller,
+Widget singleBuildIjkControllerWidget(IjkMediaController controller,
     {String adimageUrl,
     String adTitle,
     double adrevealTime,
@@ -182,18 +181,10 @@ class _DefaultIJKControllerWidgetState extends State<DefaultIJKControllerWidget>
   bool isShowad = false; //是否显示广告
   bool isSeeselectredou = true;
 
-  //添加广告动画
-  //动画控制器
-  AnimationController animationController;
-  Animation<Offset> animation;
-  //广告显示时间 广告弹出时间  广告消失时间
-  Timer adbeginTimer;
-  Timer adendTimer;
   var value;
   String videoRatioTxT = "高清"; //分辨率设置
   Widget showIconWidget;
   IJKControllerWidgetBuilder ijkControllerWidgetBuilder;
-  Timer _fulltimer;
   @override
   void initState() {
     super.initState();
@@ -201,11 +192,19 @@ class _DefaultIJKControllerWidgetState extends State<DefaultIJKControllerWidget>
     startTimer();
     controllerSubscription =
         controller.textureIdStream.listen(_onTextureIdChange);
-    //isShowbottomBar();
+    isShowbottomBar();
     //保持屏幕常亮
     Screen.keepOn(true);
-    // ijkControllerWidgetBuilder = widget.fullscreenControllerWidgetBuilder ??
-    //     (ctx) => widget.copyWith(currentFullScreenState: true);
+    //保持屏幕常亮
+    Screen.keepOn(true);
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeRight,
+      DeviceOrientation.landscapeLeft,
+    ]);
+    if (Platform.isIOS) {
+      OrientationPlugin.forceOrientation(DeviceOrientation.landscapeLeft);
+    }
+    SystemChrome.setEnabledSystemUIOverlays([]);
   }
 
   //是否显示底部
@@ -247,22 +246,6 @@ class _DefaultIJKControllerWidgetState extends State<DefaultIJKControllerWidget>
       firstbottomTimer = null;
     }
 
-    if (animationController != null) {
-      animationController.dispose();
-    }
-
-    if (adbeginTimer != null) {
-      adbeginTimer.cancel();
-      adbeginTimer = null;
-    }
-    if (adendTimer != null) {
-      adendTimer.cancel();
-      adendTimer = null;
-    }
-    if (_fulltimer != null) {
-      _fulltimer?.cancel();
-      _fulltimer = null;
-    }
     //取消屏幕活性
     Screen.keepOn(false);
     controllerSubscription.cancel();
@@ -290,13 +273,26 @@ class _DefaultIJKControllerWidgetState extends State<DefaultIJKControllerWidget>
     progressTimer = Timer.periodic(Duration(milliseconds: 350), (timer) {
       //   LogUtils.verbose("timer will call refresh info");
       controller.refreshVideoInfo();
-      if (controller != null) {
-        if (controller.ijkStatus == IjkStatus.complete ||
-            controller.videoInfo.currentPosition ==
-                controller.videoInfo.duration) {
-          controller?.seekTo(0);
+      if (controller != null && controller.videoInfo != null) {
+        if (controller.videoInfo.duration != null &&
+            controller.videoInfo.currentPosition != null) {
+          if (controller.ijkStatus == IjkStatus.complete ||
+              controller.videoInfo.duration -
+                          controller.videoInfo.currentPosition <=
+                      1 &&
+                  controller.videoInfo.duration -
+                          controller.videoInfo.currentPosition >=
+                      0) {
+            controller?.seekTo(0);
+            controller?.pause();
+          }
         }
       }
+      // if (controller != null) {
+      //   if (controller.ijkStatus == IjkStatus.complete) {
+      //     controller?.seekTo(0);
+      //   }
+      // }
     });
   }
 
@@ -341,18 +337,8 @@ class _DefaultIJKControllerWidgetState extends State<DefaultIJKControllerWidget>
       stream: controller.videoInfoStream,
       builder: (context, snapshot) {
         var info = snapshot.data;
-        if (info == null || !info.hasData) {
-          return Container(
-            color: Color.fromRGBO(0, 0, 0, 0),
-            child: Center(
-              child: Text(
-                "正在加速缓冲中",
-                style: TextStyle(color: Colors.white, fontSize: 20),
-              ),
-            ),
-          );
-        } else {
-          if (controller.ijkStatus == IjkStatus.noDatasource) {
+        if (info != null) {
+          if (!info.hasData||info.duration == 0) {
             return Container(
               color: Color.fromRGBO(0, 0, 0, 0),
               child: Center(
@@ -362,20 +348,22 @@ class _DefaultIJKControllerWidgetState extends State<DefaultIJKControllerWidget>
                 ),
               ),
             );
+          } else {
+            return Stack(
+              children: <Widget>[
+                Offstage(
+                  offstage: isShow,
+                  child: buildPortrait(info),
+                ),
+                Container(), //广告
+                //显示声音  快进后退的
+                buildShowIcon()
+              ],
+            );
           }
+        } else {
+          return Container();
         }
-
-        return Stack(
-          children: <Widget>[
-            Offstage(
-              offstage: isShow,
-              child: buildPortrait(info),
-            ),
-            Container(), //广告
-            //显示声音  快进后退的
-            buildShowIcon()
-          ],
-        );
       },
     );
   }
