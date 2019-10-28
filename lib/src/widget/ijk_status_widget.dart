@@ -42,57 +42,58 @@ class IjkStatusWidget extends StatelessWidget {
       content = Container();
     } else {
       int tcpSpeed = 0;
-      if (controller.videoInfo.tcpSpeed == null) {
+      if (controller.videoInfo.tcpSpeed == 0) {
         tcpSpeed = 0;
+        content = Container();
       } else {
         tcpSpeed = controller.videoInfo.tcpSpeed;
-      }
-      List<String> unitArr = List()
-        ..add('B/S')
-        ..add('K/S')
-        ..add('M/S')
-        ..add('G/S');
-      int index = 0;
-      while (tcpSpeed > 1024) {
-        index++;
-        tcpSpeed = tcpSpeed ~/ 1024;
-      }
-      String size = tcpSpeed.toStringAsFixed(0);
-      String speed = size + unitArr[index];
+        List<String> unitArr = List()
+          ..add('B/S')
+          ..add('K/S')
+          ..add('M/S')
+          ..add('G/S');
+        int index = 0;
+        while (tcpSpeed > 1024) {
+          index++;
+          tcpSpeed = tcpSpeed ~/ 1024;
+        }
+        String size = tcpSpeed.toStringAsFixed(0);
+        String speed = size + unitArr[index];
 
-      content = Center(
-        child: Container(
-          alignment: Alignment.center,
-          decoration: new BoxDecoration(
-            //border: new Border.all(width: 1.0, color: Colors.red),
-            color: Color.fromRGBO(0, 0, 0, 0.54),
-            borderRadius: new BorderRadius.all(new Radius.circular(20.0)),
-          ),
-          width: 80,
-          height: 80,
-          child: Column(
-            children: <Widget>[
-              Container(
-                height: 50,
-                width: 120,
-                alignment: Alignment.center,
-                child: SpinKitFadingCircle(
-                  color: Colors.white,
-                  size: 40,
+        content = Center(
+          child: Container(
+            alignment: Alignment.center,
+            decoration: new BoxDecoration(
+              //border: new Border.all(width: 1.0, color: Colors.red),
+              color: Color.fromRGBO(0, 0, 0, 0.54),
+              borderRadius: new BorderRadius.all(new Radius.circular(20.0)),
+            ),
+            width: 80,
+            height: 80,
+            child: Column(
+              children: <Widget>[
+                Container(
+                  height: 50,
+                  width: 120,
+                  alignment: Alignment.center,
+                  child: SpinKitFadingCircle(
+                    color: Colors.white,
+                    size: 40,
+                  ),
                 ),
-              ),
-              Container(
-                height: 30,
-                alignment: Alignment.center,
-                child: Text(
-                  "$speed",
-                  style: TextStyle(color: Colors.white, fontSize: 13),
-                ),
-              )
-            ],
+                Container(
+                  height: 30,
+                  alignment: Alignment.center,
+                  child: Text(
+                    "$speed",
+                    style: TextStyle(color: Colors.white, fontSize: 13),
+                  ),
+                )
+              ],
+            ),
           ),
-        ),
-      );
+        );
+      }
     }
     return content;
   }
@@ -107,20 +108,23 @@ class IjkStatusWidget extends StatelessWidget {
     }
 
     if (status == IjkStatus.preparing) {
+      print("视频正在缓存！");
       return _buildProgressWidget(context, controller);
     }
     if (status == IjkStatus.prepared) {
       //return _buildPreparedWidget(context, controller);
-
+      print("视频缓存完成了！");
       return _buildProgressWidget(context, controller);
     }
     if (status == IjkStatus.error) {
       return _buildFailWidget(context);
     }
     if (status == IjkStatus.pause) {
+      print("这个视频暂停了！");
       return _buildCenterIconButton(Icons.play_arrow, controller.play);
     }
     if (status == IjkStatus.complete) {
+      print("播放完成了 重新播放！");
       return _buildCenterIconButton(Icons.replay, () async {
         await controller?.seekTo(0);
         await controller?.play();

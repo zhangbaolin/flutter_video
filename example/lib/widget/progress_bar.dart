@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_video/src/helper/ui_helper.dart';
+import 'package:ijkplayer_example/widget/ui_helper.dart';
 
 typedef ChangeProgressHandler(double progress);
 
@@ -187,7 +187,7 @@ class _ProgressBarState extends State<ProgressBar> {
     tempLeft = progress;
 
     //widget.tapProgressHandler(tempLeft);
-    widget.changeProgressHandler(progress);
+   // widget.changeProgressHandler(progress);
   }
 
   double getProgress(Offset globalPosition) {

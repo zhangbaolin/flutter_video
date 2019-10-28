@@ -456,6 +456,8 @@ DefaultIJKControllerWidget
 
 0.1.9
 修改视频加载loading得角度 改成圆角
+0.1.10
+修复视频暂停状态异常
 ## LICENSE
 
 MIT

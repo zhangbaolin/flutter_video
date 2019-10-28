@@ -32,8 +32,7 @@ class NotifyChannel(val registry: PluginRegistry.Registrar, val textureId: Long,
         }
         player.setOnBufferingUpdateListener { mp, percent ->
             /// 在线视频缓冲
-            logi("completion buffer update $info $percent")
-           channel.invokeMethod("setOnBufferingUpdate", info)
+        //    logi("completion buffer update $info $percent")
         }
         player.setOnSeekCompleteListener {
             logi("onSeekCompletion $info")

@@ -28,13 +28,13 @@ class DialogRoute<T> extends PageRoute<T> {
 
 class FullScreenRoute<T> extends DialogRoute<T> {
   FullScreenRoute({WidgetBuilder builder})
-      : super(builder: (ctx, a, s) => fullScreenBuilder(ctx, builder, a));
+      : super(builder: (ctx, a, s) => fullScreenBuilder(ctx, builder, a, s));
 
   static Widget fullScreenBuilder(
     BuildContext context,
     WidgetBuilder builder,
     Animation<double> animation,
-   
+    Animation<double> secondaryAnimation,
   ) {
     return AnimatedBuilder(
       animation: animation,

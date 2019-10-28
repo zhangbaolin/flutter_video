@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_video/flutter_video.dart';
+import 'package:ijkplayer_example/widget/controller_widget_builder.dart';
 import 'package:ijkplayer_example/widget/single_controller_build.dart';
 
 import 'package:orientation/orientation.dart';
@@ -23,6 +24,7 @@ class _TestPageState extends State<TestPage> with WidgetsBindingObserver {
     super.initState();
     //  SystemChrome.setEnabledSystemUIOverlays([]);
     WidgetsBinding.instance.addObserver(this); //添加观察者
+    //http://app.12321hc.com/app/video0.mp4
     controller.setNetworkDataSource("http://multimedia.lx8886.com/upload/20190912174152.mp4", autoPlay: true);
 
     _timer = Timer.periodic(Duration(microseconds: 1000), (timer) {
@@ -42,10 +44,7 @@ class _TestPageState extends State<TestPage> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    double asd = (MediaQuery.of(context).size.height -
-            MediaQuery.of(context).padding.top) /
-        MediaQuery.of(context).size.width *
-        4;
+   
     return Scaffold(
       // appBar: AppBar(
 
@@ -60,7 +59,7 @@ class _TestPageState extends State<TestPage> with WidgetsBindingObserver {
               SafeArea(
                 child: Container(
                   width: MediaQuery.of(context).size.width,
-                  height: MediaQuery.of(context).size.height,
+                  height:250,
                   child: IjkPlayer(
                     mediaController: controller,
                     // textureBuilder: (context, mediaController, info) {
@@ -81,7 +80,7 @@ class _TestPageState extends State<TestPage> with WidgetsBindingObserver {
                     //   );
                     // },
                     controllerWidgetBuilder: (mediaController) {
-                      return singleBuildIjkControllerWidget(mediaController);
+                      return defaultBuildIjkControllerWidget(mediaController);
                     },
                   ),
                 ),

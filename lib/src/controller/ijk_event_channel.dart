@@ -13,17 +13,12 @@ class _IJKEventChannel {
 
   Completer _prepareCompleter;
 
-  bool _isDisposed = false;
-
-  bool get isDisposed => _isDisposed;
-
   Future<void> init() async {
     channel = MethodChannel(channelName);
     channel.setMethodCallHandler(handler);
   }
 
   void dispose() {
-    _isDisposed = true;
     channel.setMethodCallHandler(null);
     controller = null;
   }
@@ -39,15 +34,10 @@ class _IJKEventChannel {
         onPlayStateChange(getInfo(call));
         break;
       case "prepare":
-        // onPrepare(getInfo(call));
-        onPlayStateChange(getInfo(call));
+        onPrepare(getInfo(call));
         break;
       case "rotateChanged":
         onRotateChanged(call);
-        break;
-      case "setOnBufferingUpdate":
-        // onRotateChanged(call);
-        //  print("eneneneneneneneneenne");
         break;
       case "error":
         var info = await controller.getVideoInfo();

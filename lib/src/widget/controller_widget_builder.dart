@@ -247,9 +247,35 @@ class _DefaultIJKControllerWidgetState extends State<DefaultIJKControllerWidget>
 
   @override
   Widget build(BuildContext context) {
-    if (controller.isNomal) {
-      //
-      return GestureDetector(
+    // if (controller.isNomal) {
+    //   //
+    //   return GestureDetector(
+    //     behavior: HitTestBehavior.opaque,
+    //     child: buildContent(),
+    //     onDoubleTap: onDoubleTap(),
+    //     onHorizontalDragStart: wrapHorizontalGesture(_onHorizontalDragStart),
+    //     onHorizontalDragUpdate: wrapHorizontalGesture(_onHorizontalDragUpdate),
+    //     onHorizontalDragEnd: wrapHorizontalGesture(_onHorizontalDragEnd),
+    //     onVerticalDragStart: wrapVerticalGesture(_onVerticalDragStart),
+    //     onVerticalDragUpdate: wrapVerticalGesture(_onVerticalDragUpdate),
+    //     onVerticalDragEnd: wrapVerticalGesture(_onVerticalDragEnd),
+    //     onTap: onTap,
+    //     key: currentKey,
+    //   );
+    // } else {
+    //   //列表的视频
+    //   return GestureDetector(
+    //     behavior: HitTestBehavior.opaque,
+    //     child: buildContent(),
+    //     onDoubleTap: onDoubleTap(),
+    //     onHorizontalDragStart: wrapHorizontalGesture(_onHorizontalDragStart),
+    //     onHorizontalDragUpdate: wrapHorizontalGesture(_onHorizontalDragUpdate),
+    //     onHorizontalDragEnd: wrapHorizontalGesture(_onHorizontalDragEnd),
+    //     onTap: onTap,
+    //     key: currentKey,
+    //   );
+    // }
+     return GestureDetector(
         behavior: HitTestBehavior.opaque,
         child: buildContent(),
         onDoubleTap: onDoubleTap(),
@@ -262,19 +288,6 @@ class _DefaultIJKControllerWidgetState extends State<DefaultIJKControllerWidget>
         onTap: onTap,
         key: currentKey,
       );
-    } else {
-      //列表的视频
-      return GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        child: buildContent(),
-        onDoubleTap: onDoubleTap(),
-        onHorizontalDragStart: wrapHorizontalGesture(_onHorizontalDragStart),
-        onHorizontalDragUpdate: wrapHorizontalGesture(_onHorizontalDragUpdate),
-        onHorizontalDragEnd: wrapHorizontalGesture(_onHorizontalDragEnd),
-        onTap: onTap,
-        key: currentKey,
-      );
-    }
   }
 
   Widget buildContent() {
