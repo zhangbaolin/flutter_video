@@ -104,17 +104,36 @@ class IjkStatusWidget extends StatelessWidget {
     IjkStatus status,
   ) {
     if (status == IjkStatus.noDatasource) {
+      print("暂时无任何视频资源");
       return _buildNothing(context);
     }
 
     if (status == IjkStatus.preparing) {
-      print("视频正在缓存！");
-      return _buildProgressWidget(context, controller);
+      if (controller.videoInfo != null) {
+        if (controller.videoInfo.duration != null &&
+            controller.videoInfo.duration != 0.0) {
+          return _buildProgressWidget(context, controller);
+        } else {
+          return Container();
+        }
+      } else {
+        return Container();
+      }
     }
     if (status == IjkStatus.prepared) {
-      //return _buildPreparedWidget(context, controller);
-      print("视频缓存完成了！");
-      return _buildProgressWidget(context, controller);
+      //  return _buildProgressWidget(context, controller);
+
+      if (controller.videoInfo != null) {
+        if (controller.videoInfo.duration != null &&
+            controller.videoInfo.duration != 0.0) {
+          print("视频缓存完成了！");
+          return _buildProgressWidget(context, controller);
+        } else {
+          return Container();
+        }
+      } else {
+        return Container();
+      }
     }
     if (status == IjkStatus.error) {
       return _buildFailWidget(context);

@@ -24,14 +24,13 @@ class _TestPageState extends State<TestPage> with WidgetsBindingObserver {
     super.initState();
     //  SystemChrome.setEnabledSystemUIOverlays([]);
     WidgetsBinding.instance.addObserver(this); //添加观察者
-    //http://app.12321hc.com/app/video0.mp4
-    controller.setNetworkDataSource("http://multimedia.lx8886.com/upload/20190912174152.mp4", autoPlay: true);
-
-    _timer = Timer.periodic(Duration(microseconds: 1000), (timer) {
+ 
+    setPro();
+    _timer = Timer.periodic(Duration(microseconds: 100), (timer) {
     //  print("当前的播放状态：${controller.ijkStatus}");
       if (controller.ijkStatus == IjkStatus.playing &&
           controller.videoInfo.currentPosition > 0) {
-        setPro();
+        controller?.seekTo(200);
         _timer.cancel();
         _timer = null;
       }
@@ -39,12 +38,14 @@ class _TestPageState extends State<TestPage> with WidgetsBindingObserver {
   }
 
   void setPro() async {
-    await controller.seekTo(40);
+    await controller.setNetworkDataSource(
+        "http://app.12321hc.com/app/video0.mp4",
+        autoPlay: true);
+   // await controller?.seekTo(200);
   }
 
   @override
   Widget build(BuildContext context) {
-   
     return Scaffold(
       // appBar: AppBar(
 
@@ -59,7 +60,7 @@ class _TestPageState extends State<TestPage> with WidgetsBindingObserver {
               SafeArea(
                 child: Container(
                   width: MediaQuery.of(context).size.width,
-                  height:250,
+                  height: 250,
                   child: IjkPlayer(
                     mediaController: controller,
                     // textureBuilder: (context, mediaController, info) {

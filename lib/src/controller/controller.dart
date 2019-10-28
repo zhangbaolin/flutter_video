@@ -234,7 +234,10 @@ class IjkMediaController
   /// [target] unit is second
   Future<void> seekTo(double target) async {
     await _plugin?.seekTo(target);
-    _ijkStatus = IjkStatus.pause;
+    if (target != 0) {
+    //  _ijkStatus = IjkStatus.pause;
+    }
+
     refreshVideoInfo();
   }
 
@@ -259,9 +262,9 @@ class IjkMediaController
     _videoInfo = info;
     isPlaying = info.isPlaying;
     if (info.hasData) {
-            if (info.bufferPosition < 1.0 && info.isPlaying) {
+      if (info.bufferPosition < 1.0 && info.isPlaying) {
         _ijkStatus = IjkStatus.prepared;
-      } 
+      }
       _videoInfoController?.add(info);
       LogUtils.verbose("onrefreshInfo = $info");
     }

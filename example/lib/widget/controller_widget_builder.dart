@@ -194,6 +194,7 @@ class _DefaultIJKControllerWidgetState extends State<DefaultIJKControllerWidget>
   Widget showIconWidget;
 
   Timer _fulltimer;
+  bool isSeeFirstLoading = false;
   @override
   void initState() {
     super.initState();
@@ -305,46 +306,33 @@ class _DefaultIJKControllerWidgetState extends State<DefaultIJKControllerWidget>
 
   @override
   Widget build(BuildContext context) {
-    // if (controller.isNomal) {
-    //   return GestureDetector(
-    //     behavior: HitTestBehavior.opaque,
-    //     child: buildContent(),
-    //     onDoubleTap: onDoubleTap(),
-    //     onHorizontalDragStart: wrapHorizontalGesture(_onHorizontalDragStart),
-    //     onHorizontalDragUpdate: wrapHorizontalGesture(_onHorizontalDragUpdate),
-    //     onHorizontalDragEnd: wrapHorizontalGesture(_onHorizontalDragEnd),
-    //     onVerticalDragStart: wrapVerticalGesture(_onVerticalDragStart),
-    //     onVerticalDragUpdate: wrapVerticalGesture(_onVerticalDragUpdate),
-    //     onVerticalDragEnd: wrapVerticalGesture(_onVerticalDragEnd),
-    //     onTap: onTap,
-    //     key: currentKey,
-    //   );
-    // } else {
-    //   //列表的视频
-    //   return GestureDetector(
-    //     behavior: HitTestBehavior.opaque,
-    //     child: buildContent(),
-    //     onDoubleTap: onDoubleTap(),
-    //     onHorizontalDragStart: wrapHorizontalGesture(_onHorizontalDragStart),
-    //     onHorizontalDragUpdate: wrapHorizontalGesture(_onHorizontalDragUpdate),
-    //     onHorizontalDragEnd: wrapHorizontalGesture(_onHorizontalDragEnd),
-    //     onTap: onTap,
-    //     key: currentKey,
-    //   );
-    // }
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      child: buildContent(),
-      onDoubleTap: onDoubleTap(),
-      onHorizontalDragStart: wrapHorizontalGesture(_onHorizontalDragStart),
-      onHorizontalDragUpdate: wrapHorizontalGesture(_onHorizontalDragUpdate),
-      onHorizontalDragEnd: wrapHorizontalGesture(_onHorizontalDragEnd),
-      onVerticalDragStart: wrapVerticalGesture(_onVerticalDragStart),
-      onVerticalDragUpdate: wrapVerticalGesture(_onVerticalDragUpdate),
-      onVerticalDragEnd: wrapVerticalGesture(_onVerticalDragEnd),
-      onTap: onTap,
-      key: currentKey,
-    );
+    if (controller.isNomal) {
+      return GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        child: buildContent(),
+        onDoubleTap: onDoubleTap(),
+        onHorizontalDragStart: wrapHorizontalGesture(_onHorizontalDragStart),
+        onHorizontalDragUpdate: wrapHorizontalGesture(_onHorizontalDragUpdate),
+        onHorizontalDragEnd: wrapHorizontalGesture(_onHorizontalDragEnd),
+        onVerticalDragStart: wrapVerticalGesture(_onVerticalDragStart),
+        onVerticalDragUpdate: wrapVerticalGesture(_onVerticalDragUpdate),
+        onVerticalDragEnd: wrapVerticalGesture(_onVerticalDragEnd),
+        onTap: onTap,
+        key: currentKey,
+      );
+    } else {
+      //列表的视频
+      return GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        child: buildContent(),
+        onDoubleTap: onDoubleTap(),
+        onHorizontalDragStart: wrapHorizontalGesture(_onHorizontalDragStart),
+        onHorizontalDragUpdate: wrapHorizontalGesture(_onHorizontalDragUpdate),
+        onHorizontalDragEnd: wrapHorizontalGesture(_onHorizontalDragEnd),
+        onTap: onTap,
+        key: currentKey,
+      );
+    }
   }
 
   Widget buildContent() {
@@ -352,42 +340,75 @@ class _DefaultIJKControllerWidgetState extends State<DefaultIJKControllerWidget>
       stream: controller.videoInfoStream,
       builder: (context, snapshot) {
         var info = snapshot.data;
-        if (info == null || !info.hasData) {
-          return Container(
-            color: Color.fromRGBO(0, 0, 0, 0),
-            child: Center(
-              child: Text(
-                "正在加速缓冲中",
-                style: TextStyle(color: Colors.white, fontSize: 20),
-              ),
-            ),
-          );
-        } else {
-          if (controller.ijkStatus == IjkStatus.noDatasource) {
+        // print("视频得详情：$info");
+        // print("当前播放状态：${controller?.ijkStatus}");
+        if (info != null) {
+          if (info?.duration == 0.0&&controller.ijkStatus!=IjkStatus.error) {
             return Container(
               color: Color.fromRGBO(0, 0, 0, 0),
-              child: Center(
-                child: Text(
-                  "正在加速缓冲中",
-                  style: TextStyle(color: Colors.white, fontSize: 20),
+              child: Offstage(
+                offstage: isSeeFirstLoading,
+                child: Center(
+                  child: Text(
+                    "正在加速缓冲中",
+                    style: TextStyle(color: Colors.white, fontSize: 20),
+                  ),
                 ),
               ),
             );
+          } else {
+           isSeeFirstLoading = true;
+            return Stack(
+              children: <Widget>[
+                Offstage(
+                  offstage: isShow,
+                  child: buildPortrait(info),
+                ),
+                Container(), //广告
+                buildShowIcon(),
+                // buildShowPauseIcon()
+              ],
+            );
           }
+        } else {
+          return Container();
         }
+        // if (info == null || !info.hasData) {
+        //   return Container(
+        //     color: Color.fromRGBO(0, 0, 0, 0),
+        //     child: Center(
+        //       child: Text(
+        //         "正在加速缓冲中",
+        //         style: TextStyle(color: Colors.white, fontSize: 20),
+        //       ),
+        //     ),
+        //   );
+        // } else {
+        //   if (controller.ijkStatus == IjkStatus.noDatasource) {
+        //     return Container(
+        //       color: Color.fromRGBO(0, 0, 0, 0),
+        //       child: Center(
+        //         child: Text(
+        //           "正在加速缓冲中",
+        //           style: TextStyle(color: Colors.white, fontSize: 20),
+        //         ),
+        //       ),
+        //     );
+        //   }
+        // }
 
-        return Stack(
-          children: <Widget>[
-            Offstage(
-              offstage: isShow,
-              child: buildPortrait(info),
-            ),
-            Container(), //广告
-            //显示声音  快进后退的
-            buildShowIcon(),
-            // buildShowPauseIcon()
-          ],
-        );
+        // return Stack(
+        //   children: <Widget>[
+        //     Offstage(
+        //       offstage: isShow,
+        //       child: buildPortrait(info),
+        //     ),
+        //     Container(), //广告
+        //     //显示声音  快进后退的
+        //     buildShowIcon(),
+        //     // buildShowPauseIcon()
+        //   ],
+        // );
       },
     );
   }
