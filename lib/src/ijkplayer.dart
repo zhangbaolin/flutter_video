@@ -98,8 +98,8 @@ class IjkPlayerState extends State<IjkPlayer> {
     Widget stack = Stack(
       children: <Widget>[
         IgnorePointer(child: video),
-        controllerWidget,
         statusWidget,
+        controllerWidget,
       ],
     );
 //    return stack;
