@@ -1,13 +1,10 @@
-import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_lifecycle_state/flutter_lifecycle_state.dart';
 import 'package:flutter_video/flutter_video.dart';
-import 'package:flutter/services.dart';
 import 'package:ijkplayer_example/EventBus.dart';
 import 'package:ijkplayer_example/TestPage.dart';
 import 'package:ijkplayer_example/VideoBean.dart';
-
-import 'package:orientation/orientation.dart';
 
 void main() {
   runApp(new MyApp());
@@ -18,6 +15,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
+      navigatorObservers: [routeObserver],
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),

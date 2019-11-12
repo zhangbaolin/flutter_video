@@ -13,6 +13,7 @@ dependencies:
   cupertino_icons: ^0.1.2
   photo: ^0.3.4
   oktoast: ^2.1.7
+  flutter_lifecycle_state: ^1.0.0
 
   flutter_localizations:
     sdk: flutter
@@ -44,6 +45,9 @@ flutter:
     - assets/video0.mp4
     - assets/asd.png
     - assets/qaz.png
+    - assets/loading_1.png
+    - assets/loading_2.png
+
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.io/assets-and-images/#resolution-aware.
   # For details regarding adding assets from package dependencies, see

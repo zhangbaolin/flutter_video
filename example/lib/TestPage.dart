@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_video/flutter_video.dart';
 import 'package:ijkplayer_example/widget/controller_widget_builder.dart';
-import 'package:ijkplayer_example/widget/single_controller_build.dart';
 
 import 'package:orientation/orientation.dart';
 
@@ -31,6 +30,7 @@ class _TestPageState extends State<TestPage> with WidgetsBindingObserver {
       if (controller.ijkStatus == IjkStatus.playing &&
           controller.videoInfo.currentPosition > 0) {
         controller?.seekTo(200);
+        controller.isInit;
         _timer.cancel();
         _timer = null;
       }
@@ -39,7 +39,7 @@ class _TestPageState extends State<TestPage> with WidgetsBindingObserver {
 
   void setPro() async {
     await controller.setNetworkDataSource(
-        "http://app.12321hc.com/app/video0.mp4",
+        "XXX.mp4",
         autoPlay: true);
    // await controller?.seekTo(200);
   }

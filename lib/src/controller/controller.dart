@@ -235,7 +235,7 @@ class IjkMediaController
   Future<void> seekTo(double target) async {
     await _plugin?.seekTo(target);
     if (target != 0) {
-    //  _ijkStatus = IjkStatus.pause;
+      //  _ijkStatus = IjkStatus.pause;
     }
 
     refreshVideoInfo();
@@ -262,7 +262,10 @@ class IjkMediaController
     _videoInfo = info;
     isPlaying = info.isPlaying;
     if (info.hasData) {
-      if (info.bufferPosition < 1.0 && info.isPlaying) {
+      if (info.bufferPosition != null &&
+          info.bufferPosition > 0 &&
+          info.bufferPosition < 1.0 &&
+          info.isPlaying) {
         _ijkStatus = IjkStatus.prepared;
       }
       _videoInfoController?.add(info);
