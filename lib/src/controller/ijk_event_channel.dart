@@ -30,6 +30,10 @@ class _IJKEventChannel {
         // var type = FinishType.values[index];
         _onPlayFinish(getInfo(call));
         break;
+              case "playerLoadStateDidChange":
+        int loadState = call.arguments;
+        onPlayerLoadStateDidChange(loadState);
+        break;
       case "playStateChange":
         onPlayStateChange(getInfo(call));
         break;
@@ -57,7 +61,12 @@ class _IJKEventChannel {
     var map = call.arguments.cast<String, dynamic>();
     return VideoInfo.fromMap(map);
   }
-
+  void onPlayerLoadStateDidChange(int loadState) {
+    controller.loadStatus = loadState;
+    if (controller.playerLoadStateDidChange != null) {
+      controller.playerLoadStateDidChange(loadState);
+    }
+  }
   void _onPlayFinish(VideoInfo info) {
     controller?._onPlayFinish();
   }

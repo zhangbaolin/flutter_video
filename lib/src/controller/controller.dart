@@ -11,6 +11,9 @@ class IjkMediaController
   String get debugLabel => index.toString();
 
   Map<TargetPlatform, Set<IjkOption>> _options = {};
+    int loadStatus =0;
+  Function playerLoadStateDidChange ;
+  Function playerOnError;
 
   bool needChangeSpeed;
   //新添加属性  是单个还是列表视频
@@ -340,6 +343,8 @@ class IjkMediaController
     _playFinishController?.add(this);
     _ijkStatus = IjkStatus.error;
     _ijkErrorController?.add(errorValueInt);
+    if(this.playerOnError!=null)playerOnError(errorValueInt);
+    
   }
 
   /// Intercept the video frame image and get the `Uint8List` format.
@@ -381,4 +386,14 @@ class IjkMediaController
   Future<void> setSpeed(double speed) async {
     await _plugin.setSpeed(speed);
   }
+}
+class IJKMPMovieLoadState {
+  ///未知
+  static const Unknown = 0;
+  ///缓存完成可以播放
+  static const Playable = 1 << 0;
+  ///缓存完成可以播放,当shouldAutoPlay 为Yes时，将开始在这种状态
+  static const PlaythroughOK = 1 << 1;
+  ///播放后，自动设定为该方法
+  static const Stalled = 1 << 2;
 }

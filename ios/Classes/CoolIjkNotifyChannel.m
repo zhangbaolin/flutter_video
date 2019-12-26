@@ -124,6 +124,7 @@
 - (void)loadStateDidChange:(NSNotification *)notification {
     NSLog(@"load state change, state = %lu", (unsigned long)_controller.loadState);
     [self.infoDelegate onLoadStateChange];
+     [channel invokeMethod:@"playerLoadStateDidChange" (unsigned long)_controller.loadState)];
 }
 
 - (void)movieRotationChange:(NSNotification *)notification {

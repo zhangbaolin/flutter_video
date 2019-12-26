@@ -462,6 +462,9 @@ DefaultIJKControllerWidget
 修复视频初始化加载时候会出现两种加载状态的异常
 0.1.14
 修改在播放视频过程中，视频停止播放以及视频加载loading异常
+0.1.15
+新增 playerLoadStateDidChange   playerOnError  回调
+返回播放状态值  以及错误码  便于在其中处理事件
 ## LICENSE
 
 MIT
