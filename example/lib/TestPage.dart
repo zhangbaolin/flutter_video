@@ -39,7 +39,7 @@ class _TestPageState extends State<TestPage> with WidgetsBindingObserver {
 
   void setPro() async {
     await controller.setNetworkDataSource(
-        "https://file.djbar888.online/index.php/file?name=jp_n/031619-822.mp4",
+        "XXX.mp4",
         autoPlay: true);
    // await controller?.seekTo(200);
   }
